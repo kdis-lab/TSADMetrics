@@ -1,0 +1,3 @@
+- dataset1: tests/test_data/results1.csv
+- dataset2: tests/test_data/results2.csv
+- metrics_config: tests/test_data/example_metrics_config.yaml

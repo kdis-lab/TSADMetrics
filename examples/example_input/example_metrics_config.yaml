@@ -1,0 +1,6 @@
+- adc
+- dair
+- pakf:
+    k: 0.2
+- pakf:
+    k: 0.4
