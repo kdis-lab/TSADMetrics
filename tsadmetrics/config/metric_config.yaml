@@ -1,0 +1,65 @@
+- cf:
+    beta: 1.0
+- pa_auc_pr
+- pa_auc_roc
+- paf:
+    beta: 1.0
+- rbf:
+    beta: 1.0
+    p_alpha: 0.5
+    r_alpha: 0.5
+    p_bias: "flat"
+    r_bias: "flat"
+    cardinality_mode: "one"
+- swf:
+    betas: 1.0
+- adc
+- dair: 
+    k: 5
+- pakf:
+    k: 0.5
+    beta: 1.0
+- taf:
+    beta: 1.0
+    alpha: 0.5
+    delta: 5
+    theta: 0.5
+    past_range: False
+- tdir:
+    k: 5
+- wdd:
+    k: 5
+- add
+- etaf:
+    theta_p: 0.5
+    theta_r: 0.5
+- td: 
+    distance: 0
+- dtpaf:
+    k: 1
+    beta: 1.0
+- lsaf:
+    ni: 1
+    beta: 1.0
+- mttd
+- nab_score
+- aff_f:
+    beta: 1.0
+- pate:
+    early: 5
+    delay: 5
+- pate_f1:
+    early: 5
+    delay: 5
+- ttf:
+    t: 5
+    beta: 1.0
+- vus_pr:
+    window: 4
+- vus_roc:
+    window: 4
+- pw_auc_pr
+- pw_auc_roc
+- pwf:
+    beta: 1.0
+- pak
