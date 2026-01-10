@@ -1,0 +1,11 @@
+notes.txt
+**/__pycache__/
+**/*.pyc
+pytest.ini
+dist/
+build/
+*.egg-info/
+script_doc.py
+docs/plots
+docs/_add_docs
+env/
