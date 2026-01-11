@@ -55,7 +55,45 @@ User's manual can be found in the main directory documentation of this repositor
 
 ## Metric included
 
-It includes 32 metrics 
+TSADmetrics includes 34 metrics, organized according to the proposed taxonomy for time series anomaly detection metrics.
+
+| Category | Subcategory | Metric                              |
+| -------- | ----------- | ----------------------------------- |
+| SPM      | —           | PointwiseFScore                     |
+| SPM      | —           | DiceCoefficient                     |
+| SPM      | —           | PointwiseAucRoc                     |
+| SPM      | —           | PointwiseAucPr                      |
+| SPM      | —           | PrecisionAtK                        |
+| TEM      | TPDM        | PointadjustedFScore                 |
+| TEM      | TPDM        | BalancedPointadjustedFScore         |
+| TEM      | TPDM        | SegmentwiseFScore                   |
+| TEM      | TPDM        | CompositeFScore                     |
+| TEM      | TPDM        | PointadjustedAucPr                  |
+| TEM      | TPDM        | PointadjustedAucRoc                 |
+| TEM      | TPDM        | RangebasedFScore                    |
+| TEM      | DPM         | DelayThresholdedPointadjustedFScore |
+| TEM      | DPM         | EarlyDetectionScore                 |
+| TEM      | DPM         | LatencySparsityawareFScore          |
+| TEM      | DPM         | MeanTimeToDetect                    |
+| TEM      | DPM         | NabScore                            |
+| TEM      | PTDM        | AverageDetectionCount               |
+| TEM      | PTDM        | TotalDetectedInRange                |
+| TEM      | PTDM        | DetectionAccuracyInRange            |
+| TEM      | PTDM        | WeightedDetectionDifference         |
+| TEM      | PTDM        | PointadjustedAtKFScore              |
+| TEM      | PTDM        | PointadjustedAtKLFScore             |
+| TEM      | PTDM        | TimeseriesAwareFScore               |
+| TEM      | TMEM        | AbsoluteDetectionDistance           |
+| TEM      | TMEM        | EnhancedTimeseriesAwareFScore       |
+| TEM      | TMEM        | TemporalDistance                    |
+| TEM      | TSTM        | AffiliationbasedFScore              |
+| TEM      | TSTM        | NormalizedAffiliationbasedFScore    |
+| TEM      | TSTM        | PateFScore                          |
+| TEM      | TSTM        | Pate                                |
+| TEM      | TSTM        | TimeTolerantFScore                  |
+| TEM      | TSTM        | VusRoc                              |
+| TEM      | TSTM        | VusPr                               |
+
 
 ## Acknowledgements
 
@@ -75,4 +113,6 @@ The tools is free and open source, under the GNU General Public GPLv3 license.
 ## Reporting bugs
 
 Feel free to open an issue at Github if anything is not working as expected. Merge request are also encouraged, it will be carefully reviewed and merged if everything is all right.
+
+
 
