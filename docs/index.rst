@@ -7,14 +7,6 @@ Welcome to TSADmetrics - Time Series Anomaly Detection Metrics
 It provides a comprehensive set of binary and non-binary metrics designed specifically for the challenges of anomaly detection in temporal contexts.
 
 
-Acknowledgements
-================
-
-This library has been developed based on the concepts, definitions, and code published in the following article:
-
-- Sørbø, S., & Ruocco, M. (2023). *Navigating the metric maze: a taxonomy of evaluation metrics for anomaly detection in time series*. https://doi.org/10.1007/s10618-023-00988-8
-
-In addition to the theoretical framework, the implementation has been inspired by and partially based on the source code accompanying the article.
 
 
 Documentation Contents
@@ -39,3 +31,14 @@ Documentation Contents
    modules
 
 
+Acknowledgements
+================
+
+This library was supported in part by the PID2023-148396NB-I00 project of Spanish Ministry of Science and Innovation and the European Regional Development Fund, by the ProyExcel-0069 project of the Andalusian University, Research and Innovation Department.
+
+
+References
+==========
+
+This library is based on the concepts and implementations from:  
+Sørbø, S., & Ruocco, M. (2023). *Navigating the metric maze: a taxonomy of evaluation metrics for anomaly detection in time series*. https://doi.org/10.1007/s10618-023-00988-8
