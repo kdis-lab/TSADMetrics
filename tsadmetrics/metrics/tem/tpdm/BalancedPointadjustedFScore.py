@@ -59,7 +59,6 @@ class BalancedPointadjustedFScore(Metric):
             start = max(0, t - half_w)
             end = min(len(y_true) - 1, t + half_w)
             adjusted_prediction[start:end + 1] = 1
-        print(adjusted_prediction)
         tp = np.sum(adjusted_prediction * y_true)
         fp = np.sum(adjusted_prediction * (1 - y_true))
         fn = np.sum((1 - adjusted_prediction) * y_true)

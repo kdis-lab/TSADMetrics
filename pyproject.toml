@@ -1,7 +1,8 @@
 [project]
 name = "tsadmetrics"
-version = "1.0.8"
+version = "1.0.9"
 description = "Librería para evaluación de detección de anomalías en series temporales"
+license = { file = "LICENSE" }
 readme = "README.md"
 authors = [
   { name = "Pedro Rafael Velasco Priego", email = "i12veprp@uco.es" },
@@ -39,7 +40,7 @@ build-backend = "setuptools.build_meta"
 [dynamic]
 classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
+        "License :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",

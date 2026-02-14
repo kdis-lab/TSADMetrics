@@ -23,13 +23,11 @@ def range_convers_new( label):
 		i = 0
 		j = 0 
 		while j < len(label):
-			# print(i)
 			while label[i] == 0:
 				i+=1
 				if i >= len(label):  #?
 					break			 #?
 			j = i+1
-			# print('j'+str(j))
 			if j >= len(label):
 				if j==len(label):
 					L.append((i,j-1))
