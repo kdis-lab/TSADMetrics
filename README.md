@@ -23,7 +23,6 @@ It provides a comprehensive set of metrics specifically designed to handle the t
 
 - **Flexible Configuration**: Load metrics from YAML configuration files or global evaluation config files.
 
-- **CLI Tool**: Compute metrics directly from files without writing Python code.
 
 ---
 

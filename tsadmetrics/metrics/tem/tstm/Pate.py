@@ -1,5 +1,5 @@
 from ....base.Metric import Metric
-from pate.PATE_metric import PATE
+from ....utils.functions_pate import PATE
 import numpy as np
 
 
