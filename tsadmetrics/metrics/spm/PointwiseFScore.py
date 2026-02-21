@@ -62,15 +62,19 @@ class PointwiseFScore(Metric):
                 The computed point-wise F-score.
                 Returns 0 if either precision or recall is 0.
         """
-        tp = np.sum(y_pred * y_true)
-        fp = np.sum(y_pred * (1 - y_true))
-        fn = np.sum((1 - y_pred) * y_true)
+        tp = int(np.count_nonzero(np.logical_and(y_true, y_pred)))
+        if tp == 0:
+            return 0.0
 
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        true_positives_total = int(np.count_nonzero(y_true))
+        pred_positives_total = int(np.count_nonzero(y_pred))
+        fn = true_positives_total - tp
+        fp = pred_positives_total - tp
 
-        if precision == 0 or recall == 0:
-            return 0
-        
-        beta = self.params['beta']
-        return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
+        beta = float(self.params["beta"])
+        beta2 = beta * beta
+        numerator = (1.0 + beta2) * tp
+        denominator = numerator + beta2 * fn + fp
+        if denominator <= 0.0:
+            return 0.0
+        return float(numerator / denominator)

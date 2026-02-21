@@ -51,6 +51,13 @@ class LatencySparsityawareFScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="lsaf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series_bool):
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the latency and sparsity aware F-score.
@@ -66,19 +73,41 @@ class LatencySparsityawareFScore(Metric):
             of precision and recall, adjusted by the beta value.
         """
 
-        if np.sum(y_pred) == 0:
-            return 0
+        if np.count_nonzero(y_pred) == 0:
+            return 0.0
 
-        _, precision, recall, _, _, _, _, _ = calc_twseq(
-            y_pred,
-            y_true,
-            normal=0,
-            threshold=0.5,
-            tw=self.params["ni"],
-        )
+        tw = int(self.params["ni"])
+        if tw == 1:
+            actual = np.asarray(y_true, dtype=np.bool_)
+            predict = np.asarray(y_pred, dtype=np.bool_)
+            adjusted = predict.copy()
+            starts, ends = self._segment_bounds(actual)
+
+            for start, end in zip(starts, ends):
+                seg_pred = predict[start : end + 1]
+                if np.any(seg_pred):
+                    first_idx = int(start + np.flatnonzero(seg_pred)[0])
+                    adjusted[first_idx : end + 1] = True
+                else:
+                    adjusted[start : end + 1] = False
+
+            tp = float(np.count_nonzero(np.logical_and(adjusted, actual)))
+            fp = float(np.count_nonzero(np.logical_and(adjusted, np.logical_not(actual))))
+            fn = float(np.count_nonzero(np.logical_and(np.logical_not(adjusted), actual)))
+            precision = tp / (tp + fp + 0.00001)
+            recall = tp / (tp + fn + 0.00001)
+        else:
+            _, precision, recall, _, _, _, _, _ = calc_twseq(
+                y_pred,
+                y_true,
+                normal=0,
+                threshold=0.5,
+                tw=tw,
+            )
 
         if precision == 0 or recall == 0:
-            return 0
+            return 0.0
 
-        beta = self.params["beta"]
-        return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
+        beta = float(self.params["beta"])
+        beta2 = beta * beta
+        return ((1.0 + beta2) * precision * recall) / (beta2 * precision + recall)

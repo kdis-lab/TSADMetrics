@@ -54,6 +54,11 @@ class VusPr(Metric):
             float: VUS-PR score.
         """
         window = self.params["window"]
-        _, _, _, _, _, _, _, pr = generate_curve(y_true, y_anomaly_scores, slidingWindow=window)
+        _, _, _, _, _, _, _, pr = generate_curve(
+            y_true,
+            y_anomaly_scores,
+            slidingWindow=window,
+            version="opt_mem",
+        )
 
         return pr

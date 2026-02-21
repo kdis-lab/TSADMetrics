@@ -57,7 +57,10 @@ class VusRoc(Metric):
         """
 
         _, _, _, _, _, _, roc, _ = generate_curve(
-            y_true, y_anomaly_scores, self.params["window"]
+            y_true,
+            y_anomaly_scores,
+            self.params["window"],
+            version="opt_mem",
         )
 
         return roc

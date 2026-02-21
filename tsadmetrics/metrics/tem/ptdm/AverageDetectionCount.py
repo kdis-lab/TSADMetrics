@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise, full_series_to_pointwise
 
 class AverageDetectionCount(Metric):
     """
@@ -29,6 +28,14 @@ class AverageDetectionCount(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="adc", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the average detection count.
@@ -42,17 +49,13 @@ class AverageDetectionCount(Metric):
         Returns:
             float: The average detection count score.
         """
+        starts, ends = self._segment_bounds(y_true)
+        if starts.size == 0:
+            return float(np.mean(np.array([], dtype=float)))
 
-        
-        azs = full_series_to_segmentwise(y_true)
-        a_points = full_series_to_pointwise(y_pred)
-
-        counts = []
-        for az in azs:
-            count = 0
-            for ap in a_points:
-                if ap >= az[0] and ap <= az[1]:
-                    count+=1
-            counts.append(count/(az[1] - az[0] + 1))  # Normalize by segment length
-        
-        return np.mean(counts)
+        pred_prefix_sum = np.concatenate(
+            (np.array([0], dtype=np.int64), np.cumsum(y_pred, dtype=np.int64))
+        )
+        detected_counts = pred_prefix_sum[ends + 1] - pred_prefix_sum[starts]
+        segment_lengths = ends - starts + 1
+        return float(np.mean(detected_counts / segment_lengths))

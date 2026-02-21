@@ -1,17 +1,17 @@
 import numpy as np
-from itertools import groupby
-from operator import itemgetter
 
 from .functions_auc import auc, binary_clf_curve
 
 
 def convert_vector_to_events_pate(vector_array):
-    positive_indexes = np.where(vector_array > 0)[0]
-    events = []
-    for _, g in groupby(enumerate(positive_indexes), lambda ix: ix[0] - ix[1]):
-        cur_cut = list(map(itemgetter(1), g))
-        events.append((cur_cut[0], cur_cut[-1]))
-    return events
+    positives = np.asarray(vector_array) > 0
+    if positives.size == 0:
+        return []
+
+    transitions = np.diff(positives.astype(np.int8), prepend=0, append=0)
+    starts = np.flatnonzero(transitions == 1)
+    ends = np.flatnonzero(transitions == -1) - 1
+    return list(zip(starts.tolist(), ends.tolist()))
 
 
 def generate_buffer_points(max_buffer_size, num_splits, include_zero=True):

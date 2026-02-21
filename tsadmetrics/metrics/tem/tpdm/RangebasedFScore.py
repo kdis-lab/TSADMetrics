@@ -105,24 +105,68 @@ class RangebasedFScore(Metric):
         Returns:
             float: Omega reward.
         """
-        if r1[1] < r2[0] or r1[0] > r2[1]:
+        overlap_start = max(r1[0], r2[0])
+        overlap_end = min(r1[1], r2[1])
+        if overlap_start > overlap_end:
             return 0
         overlap_count[0] += 1
-        overlap = np.zeros(r1.shape)
-        overlap[0] = max(r1[0], r2[0])
-        overlap[1] = min(r1[1], r2[1])
-        return self._omega_function(bias, r1, overlap)
+        return self._omega_function(bias, r1, overlap_start, overlap_end)
 
-    def _omega_function(self, bias, rrange, overlap):
+    @staticmethod
+    def _sum_int_range(start, end):
+        if end < start:
+            return 0.0
+        count = end - start + 1
+        return 0.5 * float(start + end) * float(count)
+
+    def _omega_function(self, bias, rrange, overlap_start, overlap_end):
         """Compute normalized positional omega function for range overlap."""
-        anomaly_length = rrange[1] - rrange[0] + 1
-        my_positional_bias, max_positional_bias = 0, 0
+        anomaly_length = int(rrange[1] - rrange[0] + 1)
+        if anomaly_length <= 0:
+            return 0
 
+        left = int(overlap_start - rrange[0] + 1)
+        right = int(overlap_end - rrange[0] + 1)
+        if left > right:
+            return 0
+
+        if bias == "flat":
+            return float(right - left + 1) / float(anomaly_length)
+
+        if bias == "front":
+            denominator = float(anomaly_length * (anomaly_length + 1) / 2.0)
+            count = right - left + 1
+            numerator = float(count * (anomaly_length + 1)) - self._sum_int_range(left, right)
+            return numerator / denominator if denominator > 0 else 0
+
+        if bias == "back":
+            denominator = float(anomaly_length * (anomaly_length + 1) / 2.0)
+            numerator = self._sum_int_range(left, right)
+            return numerator / denominator if denominator > 0 else 0
+
+        if bias == "middle":
+            midpoint = anomaly_length // 2
+
+            left_front = left
+            right_front = min(right, midpoint)
+            numerator_front = self._sum_int_range(left_front, right_front)
+
+            left_back = max(left, midpoint + 1)
+            right_back = right
+            count_back = max(0, right_back - left_back + 1)
+            numerator_back = (
+                float(count_back * (anomaly_length + 1)) - self._sum_int_range(left_back, right_back)
+            )
+
+            numerator = numerator_front + numerator_back
+            denominator = float(((anomaly_length + 1) // 2) * ((anomaly_length + 2) // 2))
+            return numerator / denominator if denominator > 0 else 0
+
+        my_positional_bias, max_positional_bias = 0.0, 0.0
         for i in range(1, anomaly_length + 1):
             temp_bias = self._delta_function(bias, i, anomaly_length)
             max_positional_bias += temp_bias
-            j = rrange[0] + i - 1
-            if overlap[0] <= j <= overlap[1]:
+            if left <= i <= right:
                 my_positional_bias += temp_bias
 
         return my_positional_bias / max_positional_bias if max_positional_bias > 0 else 0

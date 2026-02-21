@@ -63,20 +63,15 @@ class DiceCoefficient(Metric):
         Returns:
             float: The Dice Coefficient score.
         """
-        y_true = np.asarray(y_true).astype(int)
-        y_pred = np.asarray(y_pred).astype(int)
-
-        if len(y_true) == 0 or len(y_true) != len(y_pred):
+        if y_true.size == 0:
             return 0.0
 
-        TP = np.sum((y_true == 1) & (y_pred == 1))
-        FP = np.sum((y_true == 0) & (y_pred == 1))
-        FN = np.sum((y_true == 1) & (y_pred == 0))
-
-        denom = (2 * TP + FP + FN)
+        tp = float(np.dot(y_true, y_pred))
+        true_positive_total = float(np.sum(y_true))
+        pred_positive_total = float(np.sum(y_pred))
+        denom = true_positive_total + pred_positive_total
 
         if denom == 0:
             return 1.0
 
-        dice = (2 * TP) / denom
-        return float(dice)
+        return float((2.0 * tp) / denom)

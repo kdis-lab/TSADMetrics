@@ -1,5 +1,4 @@
 from ...base.Metric import Metric
-import numpy as np
 from ...utils.functions_auc import roc_curve, auc
 
 class PointwiseAucRoc(Metric):

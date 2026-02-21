@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise
 
 class PointadjustedFScore(Metric):
     """
@@ -55,6 +54,14 @@ class PointadjustedFScore(Metric):
         """
         super().__init__(name="paf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Compute the point-adjusted F-score.
@@ -70,17 +77,19 @@ class PointadjustedFScore(Metric):
                 The computed point-adjusted F-score. Returns 0 if either precision or
                 recall is 0.
         """
-        adjusted_prediction = y_pred.copy()
+        y_true_bool = np.asarray(y_true, dtype=np.bool_)
+        y_pred_bool = np.asarray(y_pred, dtype=np.bool_)
 
-        for start, end in full_series_to_segmentwise(y_true):
-            if np.any(adjusted_prediction[start:end + 1]):
-                adjusted_prediction[start:end + 1] = 1
-            else:
-                adjusted_prediction[start:end + 1] = 0
+        starts, ends = self._segment_bounds(y_true_bool)
+        total_true = int(np.sum(y_true_bool, dtype=np.int64))
 
-        tp = np.sum(adjusted_prediction * y_true)
-        fp = np.sum(adjusted_prediction * (1 - y_true))
-        fn = np.sum((1 - adjusted_prediction) * y_true)
+        tp = 0
+        for start, end in zip(starts, ends):
+            if np.any(y_pred_bool[start:end + 1]):
+                tp += int(end - start + 1)
+
+        fp = int(np.sum(y_pred_bool & ~y_true_bool, dtype=np.int64))
+        fn = total_true - tp
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0

@@ -120,6 +120,11 @@ class TimeseriesAwareFScore(Metric):
     
     def _sum_of_func(self, start_time, end_time, org_start, org_end,
                      func) -> float:
+        if end_time < start_time:
+            return 0.0
+        if func is self._uniform_func:
+            return float(end_time - start_time + 1)
+
         val = 0.0
         for timestamp in range(start_time, end_time + 1):
             val += func(self._min_max_norm(timestamp, org_start, org_end, -6, 6))

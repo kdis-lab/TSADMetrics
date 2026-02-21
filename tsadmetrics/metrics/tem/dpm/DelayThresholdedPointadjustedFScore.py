@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise
 
 
 class DelayThresholdedPointadjustedFScore(Metric):
@@ -50,6 +49,14 @@ class DelayThresholdedPointadjustedFScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="dtpaf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the delay thresholded point-adjusted F-score.
@@ -63,29 +70,36 @@ class DelayThresholdedPointadjustedFScore(Metric):
         Returns:
             float: The computed delay thresholded point-adjusted F-score.
         """
+        k = int(self.params["k"])
 
-        adjusted_prediction = y_pred.copy()
-        k = self.params["k"]
+        starts, ends = self._segment_bounds(y_true)
+        y_true_bool = np.asarray(y_true, dtype=np.bool_)
+        tp = 0
+        if k == 1:
+            for start, end in zip(starts, ends):
+                if y_pred[start] == 1:
+                    tp += int(end - start + 1)
+        elif k > 1:
+            pred_prefix_sum = np.concatenate(
+                (np.array([0], dtype=np.int64), np.cumsum(y_pred, dtype=np.int64))
+            )
+            for start, end in zip(starts, ends):
+                window_end = min(start + k - 1, end)
+                if (pred_prefix_sum[window_end + 1] - pred_prefix_sum[start]) > 0:
+                    tp += int(end - start + 1)
 
-        for start, end in full_series_to_segmentwise(y_true):
-            anomaly_adjusted = False
-            for i in range(start, min(start + k, end + 1)):
-                if adjusted_prediction[i] == 1:
-                    adjusted_prediction[start:end + 1] = 1
-                    anomaly_adjusted = True
-                    break
-            if not anomaly_adjusted:
-                adjusted_prediction[start:end + 1] = 0
+        true_positives_total = int(np.count_nonzero(y_true_bool))
+        fn = true_positives_total - tp
+        pred_positives_total = int(np.count_nonzero(y_pred))
+        pred_on_true = int(np.count_nonzero(np.logical_and(y_pred, y_true_bool)))
+        fp = pred_positives_total - pred_on_true
 
-        tp = np.sum(adjusted_prediction * y_true)
-        fp = np.sum(adjusted_prediction * (1 - y_true))
-        fn = np.sum((1 - adjusted_prediction) * y_true)
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
 
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        if precision == 0.0 or recall == 0.0:
+            return 0.0
 
-        if precision == 0 or recall == 0:
-            return 0
-
-        beta = self.params["beta"]
-        return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
+        beta = float(self.params["beta"])
+        beta2 = beta * beta
+        return ((1.0 + beta2) * precision * recall) / (beta2 * precision + recall)

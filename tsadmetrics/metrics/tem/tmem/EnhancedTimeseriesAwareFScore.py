@@ -1,7 +1,7 @@
 from ....base.Metric import Metric
 import numpy as np
 import math
-from ....utils.functions_conversion import full_series_to_segmentwise, full_series_to_pointwise
+from ....utils.functions_conversion import full_series_to_segmentwise
 class EnhancedTimeseriesAwareFScore(Metric):
     """
     Calculate enhanced time series aware F-score for anomaly detection in time series.
@@ -64,6 +64,11 @@ class EnhancedTimeseriesAwareFScore(Metric):
     
     def _sum_of_func(self, start_time, end_time, org_start, org_end,
                      func) -> float:
+        if end_time < start_time:
+            return 0.0
+        if func is self._uniform_func:
+            return float(end_time - start_time + 1)
+
         val = 0.0
         for timestamp in range(start_time, end_time + 1):
             val += func(self._min_max_norm(timestamp, org_start, org_end, -6, 6))
@@ -104,14 +109,9 @@ class EnhancedTimeseriesAwareFScore(Metric):
     
     def _compute_overlap_scores_and_weights(self, y_true_sw, y_pred_sw):
 
-        predictions_weight = []
-        predictions_total_weight = 0.0
-        #computing weights
-        for a_prediction in y_pred_sw:
-            first, last = a_prediction
-            temp_weight = math.sqrt(last-first+1)
-            predictions_weight.append(temp_weight)
-            predictions_total_weight += temp_weight
+        pred_lengths = y_pred_sw[:, 1] - y_pred_sw[:, 0] + 1 if len(y_pred_sw) > 0 else np.array([])
+        predictions_weight = np.sqrt(pred_lengths).astype(float)
+        predictions_total_weight = float(np.sum(predictions_weight))
 
         #computing the score matrix
         ambiguous_inst = self._gen_ambiguous(y_true_sw, y_pred_sw)
@@ -122,13 +122,12 @@ class EnhancedTimeseriesAwareFScore(Metric):
                     float(self._overlap_and_subsequent_score(y_true_sw[anomaly_id], ambiguous_inst[anomaly_id], y_pred_sw[prediction_id]))
 
         #computing the maximum scores for each anomaly or prediction
-        max_anomaly_score = []
-        max_prediction_score = []
-        for an_anomaly in y_true_sw:
-            start, end = an_anomaly
-            max_anomaly_score.append(float(self._sum_of_func(start, end, start, end, self._uniform_func)))
-        for a_prediction in y_pred_sw:
-            max_prediction_score.append(a_prediction[1]-a_prediction[0] + 1)
+        max_anomaly_score = (
+            (y_true_sw[:, 1] - y_true_sw[:, 0] + 1).astype(float).tolist()
+            if len(y_true_sw) > 0
+            else []
+        )
+        max_prediction_score = pred_lengths.tolist()
 
 
         return predictions_weight, predictions_total_weight, overlap_score_mat_org, max_anomaly_score, max_prediction_score
@@ -185,12 +184,10 @@ class EnhancedTimeseriesAwareFScore(Metric):
 
 
         scores = (detection_scores + detection_scores * portion_scores)/2
-        final_score = 0.0
-        for i in range(max(len(scores),len(etap_d),len(corrected_id_list))):
-            if i < len(scores):
-                final_score += float(predictions_weight[i]) * scores[i]
-            
-        
+        if predictions_total_weight == 0.0:
+            return 0.0
+
+        final_score = float(np.dot(predictions_weight, scores))
         final_score /= float(predictions_total_weight)
         return final_score
 

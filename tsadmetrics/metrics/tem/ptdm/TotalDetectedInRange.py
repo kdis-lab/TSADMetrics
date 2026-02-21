@@ -65,8 +65,8 @@ class TotalDetectedInRange(Metric):
             float: The total detected in range score.
         """
 
-        if np.sum(y_pred) == 0:
-            return 0
+        if np.count_nonzero(y_pred) == 0:
+            return 0.0
 
         k = self.params["k"]
         em, da, ma, _ = counting_method(y_true, y_pred, k)

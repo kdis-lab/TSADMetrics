@@ -1,5 +1,5 @@
 from ....base.Metric import Metric
-from ....utils.functions_conversion import full_series_to_segmentwise, full_series_to_pointwise
+import numpy as np
 
 class AbsoluteDetectionDistance(Metric):
     """
@@ -27,6 +27,14 @@ class AbsoluteDetectionDistance(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="add", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the absolute detection distance.
@@ -40,17 +48,39 @@ class AbsoluteDetectionDistance(Metric):
         Returns:
             float: The absolute detection distance.
         """
-
-        azs = full_series_to_segmentwise(y_true)
-        a_points = full_series_to_pointwise(y_pred)
-        if len(a_points) == 0:
+        starts, ends = self._segment_bounds(y_true)
+        a_points = np.flatnonzero(y_pred)
+        point_count = int(a_points.size)
+        if point_count == 0:
             return 0
 
-        distance = 0
-        for az in azs:
-            for ap in a_points:
-                if az[0] <= ap <= az[1]:
-                    center = int((az[0] + az[1]) / 2)
-                    distance += abs(ap - center) / max(1, center)
+        if starts.size == 0:
+            return 0.0
 
-        return distance / len(a_points)
+        prefix_points = np.concatenate(
+            (np.array([0], dtype=np.int64), np.cumsum(a_points, dtype=np.int64))
+        )
+
+        distance = 0.0
+        for start, end in zip(starts, ends):
+            left = int(np.searchsorted(a_points, start, side="left"))
+            right = int(np.searchsorted(a_points, end, side="right"))
+            if left >= right:
+                continue
+
+            center = int((int(start) + int(end)) / 2)
+            norm = max(1, center)
+
+            mid = int(np.searchsorted(a_points, center, side="right"))
+            mid = max(left, min(mid, right))
+
+            left_count = mid - left
+            left_sum = int(prefix_points[mid] - prefix_points[left])
+            right_count = right - mid
+            right_sum = int(prefix_points[right] - prefix_points[mid])
+
+            left_contrib = center * left_count - left_sum
+            right_contrib = right_sum - center * right_count
+            distance += (left_contrib + right_contrib) / norm
+
+        return distance / point_count

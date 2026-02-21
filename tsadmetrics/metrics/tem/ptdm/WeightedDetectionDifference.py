@@ -73,9 +73,8 @@ class WeightedDetectionDifference(Metric):
         Returns:
             float: The weighted detection difference.
         """
-
-        if np.sum(y_pred) == 0:
-            return 0
+        if np.count_nonzero(y_pred) == 0:
+            return 0.0
 
         def gaussian(dt, tmax):
             if dt < tmax:
@@ -83,22 +82,43 @@ class WeightedDetectionDifference(Metric):
             else:
                 return -1
 
-        tmax = len(y_true)
+        tmax = int(len(y_true))
         ones_indices = np.where(y_true == 1)[0]
         y_modified = y_true.astype(float).copy()
 
-        for i in range(len(y_true)):
-            if y_true[i] == 0:
-                dt = np.min(np.abs(ones_indices - i)) if len(ones_indices) > 0 else tmax
-                y_modified[i] = gaussian(dt, tmax)
+        zero_mask = y_true == 0
+        if ones_indices.size == 0:
+            y_modified[zero_mask] = -1.0
+        else:
+            n = y_true.size
+            dist = np.full(n, tmax, dtype=np.int64)
+            last_one = -1
+            for i in range(n):
+                if y_true[i] == 1:
+                    last_one = i
+                    dist[i] = 0
+                elif last_one != -1:
+                    dist[i] = i - last_one
 
-        ws = 0
-        wf = 0
-        for i in range(len(y_pred)):
-            if y_pred[i] != 1:
-                ws += y_modified[i]
-            else:
-                wf += y_modified[i]
+            last_one = -1
+            for i in range(n - 1, -1, -1):
+                if y_true[i] == 1:
+                    last_one = i
+                elif last_one != -1:
+                    right_dist = last_one - i
+                    if right_dist < dist[i]:
+                        dist[i] = right_dist
+
+            zero_dist = dist[zero_mask]
+            y_modified[zero_mask] = np.where(
+                zero_dist < tmax,
+                1.0 - (zero_dist / tmax),
+                -1.0,
+            )
+
+        pred_mask = y_pred == 1
+        wf = float(np.sum(y_modified[pred_mask]))
+        ws = float(np.sum(y_modified[np.logical_not(pred_mask)]))
 
         _, _, _, fa = counting_method(y_true, y_pred, int(self.params["k"]))
 

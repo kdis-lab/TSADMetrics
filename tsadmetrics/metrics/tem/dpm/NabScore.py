@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_pointwise
 from ....utils.functions_nabscore import Sweeper, calculate_scores
 
 class NabScore(Metric):
@@ -45,22 +44,24 @@ class NabScore(Metric):
         """
         sweeper = Sweeper(probationPercent=0, costMatrix={"tpWeight": 1, "fpWeight": 0.11, "fnWeight": 1})
 
-        if len(full_series_to_pointwise(y_pred)) == 0:
+        y_pred_pw = np.flatnonzero(y_pred)
+        if y_pred_pw.size == 0:
             return 0
-        if len(full_series_to_pointwise(y_true)) == 0:
+        y_true_pw = np.flatnonzero(y_true)
+        if y_true_pw.size == 0:
             return np.nan
 
         try:
             sweeper, null_score, raw_score = calculate_scores(
                 sweeper,
-                full_series_to_pointwise(y_true),
-                full_series_to_pointwise(y_pred),
+                y_true_pw,
+                y_pred_pw,
                 len(y_true)
             )
             sweeper, null_score, perfect_score = calculate_scores(
                 sweeper,
-                full_series_to_pointwise(y_true),
-                full_series_to_pointwise(y_true),
+                y_true_pw,
+                y_true_pw,
                 len(y_true)
             )
             return (raw_score - null_score) / (perfect_score - null_score) * 100

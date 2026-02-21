@@ -15,34 +15,19 @@ import numpy as np
 
 
 def range_convers_new( label):
-		'''
-		input: arrays of binary values 
-		output: list of ordered pair [[a0,b0], [a1,b1]... ] of the inputs
-		'''
-		L = []
-		i = 0
-		j = 0 
-		while j < len(label):
-			while label[i] == 0:
-				i+=1
-				if i >= len(label):  #?
-					break			 #?
-			j = i+1
-			if j >= len(label):
-				if j==len(label):
-					L.append((i,j-1))
-	
-				break
-			while label[j] != 0:
-				j+=1
-				if j >= len(label):
-					L.append((i,j-1))
-					break
-			if j >= len(label):
-				break
-			L.append((i, j-1))
-			i = j
-		return L
+        '''
+        input: arrays of binary values 
+        output: list of ordered pair [[a0,b0], [a1,b1]... ] of the inputs
+        '''
+        label_arr = np.asarray(label)
+        if label_arr.size == 0:
+            return []
+
+        positives = label_arr != 0
+        transitions = np.diff(positives.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return list(zip(starts.tolist(), ends.tolist()))
 
 def new_sequence(label, sequence_original, window):
     a = max(sequence_original[0][0] - window // 2, 0)

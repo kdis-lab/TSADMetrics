@@ -13,7 +13,7 @@ class PrecisionAtK(Metric):
     in `y_true`.
 
     .. math::
-        k = \sum(y\_true)
+        k = \\sum(y\\_true)
 
     Reference:
         Implementation based on:
@@ -61,12 +61,15 @@ class PrecisionAtK(Metric):
                 If `k = sum(y_true)` is 0.
                 If fewer than `k` points are predicted as anomalies.
         """
-        k = int(sum(y_true))
+        k = int(np.count_nonzero(y_true))
         assert k > 0, "The number of true anomalies (k) must be greater than zero."
-        threshold = np.sort(y_anomaly_scores)[-k]
+        n_samples = int(y_anomaly_scores.size)
+        threshold_idx = n_samples - k
+        threshold = np.partition(y_anomaly_scores, threshold_idx)[threshold_idx]
 
         pred = y_anomaly_scores >= threshold
-        assert sum(pred) >= k, (
-            f"Number of predicted positives ({sum(pred)}) should be >= k ({k})."
+        pred_count = int(np.count_nonzero(pred))
+        assert pred_count >= k, (
+            f"Number of predicted positives ({pred_count}) should be >= k ({k})."
         )
-        return np.dot(pred, y_true) / sum(pred)
+        return float(np.dot(pred, y_true) / pred_count)

@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise
 from math import ceil
 
 class BalancedPointadjustedFScore(Metric):
@@ -43,25 +42,50 @@ class BalancedPointadjustedFScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="bpaf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
-        adjusted_prediction = y_pred.copy()
+        y_true_bool = np.asarray(y_true, dtype=np.bool_)
+        adjusted_prediction = np.asarray(y_pred, dtype=np.bool_).copy()
         w = self.params['w']
         half_w = ceil(w / 2)
+        n = int(y_true_bool.size)
 
-        for start, end in full_series_to_segmentwise(y_true):
-            if np.any(adjusted_prediction[start:end + 1]):
-                adjusted_prediction[start:end + 1] = 1
+        starts, ends = self._segment_bounds(y_true_bool)
+        for start, end in zip(starts, ends):
+            adjusted_prediction[start:end + 1] = bool(np.any(adjusted_prediction[start:end + 1]))
+
+        fp_indices = np.flatnonzero(adjusted_prediction & ~y_true_bool)
+        if fp_indices.size > 0:
+            window_size = (2 * half_w + 1) if half_w >= 0 else 0
+            if half_w < 0 or (fp_indices.size * window_size) <= n:
+                for t in fp_indices:
+                    start = max(0, int(t) - half_w)
+                    end = min(n - 1, int(t) + half_w)
+                    if start <= end:
+                        adjusted_prediction[start:end + 1] = True
             else:
-                adjusted_prediction[start:end + 1] = 0
+                left = np.maximum(0, fp_indices - half_w)
+                right = np.minimum(n - 1, fp_indices + half_w)
+                valid = left <= right
+                if np.any(valid):
+                    diff = np.zeros(n + 1, dtype=np.int32)
+                    np.add.at(diff, left[valid], 1)
+                    np.add.at(diff, right[valid] + 1, -1)
+                    expanded = np.cumsum(diff[:-1], dtype=np.int64) > 0
+                    adjusted_prediction[expanded] = True
 
-        fp_indices = np.where((adjusted_prediction == 1) & (y_true == 0))[0]
-        for t in fp_indices:
-            start = max(0, t - half_w)
-            end = min(len(y_true) - 1, t + half_w)
-            adjusted_prediction[start:end + 1] = 1
-        tp = np.sum(adjusted_prediction * y_true)
-        fp = np.sum(adjusted_prediction * (1 - y_true))
-        fn = np.sum((1 - adjusted_prediction) * y_true)
+        tp = int(np.sum(adjusted_prediction & y_true_bool, dtype=np.int64))
+        total_pred = int(np.sum(adjusted_prediction, dtype=np.int64))
+        total_true = int(np.sum(y_true_bool, dtype=np.int64))
+        fp = total_pred - tp
+        fn = total_true - tp
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0

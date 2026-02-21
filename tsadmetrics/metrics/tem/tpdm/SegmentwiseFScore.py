@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise
 
 class SegmentwiseFScore(Metric):
     """
@@ -45,6 +44,35 @@ class SegmentwiseFScore(Metric):
         """
         super().__init__(name="swf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
+    @staticmethod
+    def _count_segments_with_overlap(a_starts, a_ends, b_starts, b_ends):
+        if a_starts.size == 0 or b_starts.size == 0:
+            return 0
+
+        i, j = 0, 0
+        overlap_count = 0
+        n_a = int(a_starts.size)
+        n_b = int(b_starts.size)
+
+        while i < n_a and j < n_b:
+            if a_ends[i] < b_starts[j]:
+                i += 1
+            elif b_ends[j] < a_starts[i]:
+                j += 1
+            else:
+                overlap_count += 1
+                i += 1
+
+        return overlap_count
+
     def _compute(self, y_true, y_pred):
         """
         Compute the segment-wise F-score.
@@ -56,27 +84,20 @@ class SegmentwiseFScore(Metric):
         Returns:
             float: Segment-wise F-score.
         """
-        beta = self.params["beta"]
+        beta = float(self.params["beta"])
+        beta2 = beta * beta
 
-        # Count true positives and false negatives per ground-truth segment
-        tp, fn = 0, 0
-        for gt_segment in full_series_to_segmentwise(y_true):
-            if np.any(y_pred[gt_segment[0]:gt_segment[1]+1]):
-                tp += 1
-            else:
-                fn += 1
+        gt_starts, gt_ends = self._segment_bounds(y_true)
+        pred_starts, pred_ends = self._segment_bounds(y_pred)
 
-        # Count false positives per predicted segment
-        fp = 0
-        for pred_segment in full_series_to_segmentwise(y_pred):
-            if not np.any(y_true[pred_segment[0]:pred_segment[1]+1]):
-                fp += 1
+        tp = self._count_segments_with_overlap(gt_starts, gt_ends, pred_starts, pred_ends)
+        fn = int(gt_starts.size) - tp
+        pred_overlap = self._count_segments_with_overlap(pred_starts, pred_ends, gt_starts, gt_ends)
+        fp = int(pred_starts.size) - pred_overlap
 
-        # Compute precision and recall
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
 
-        # Return F-beta score
-        if precision == 0 or recall == 0:
+        if precision == 0.0 or recall == 0.0:
             return 0.0
-        return (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
+        return (1.0 + beta2) * precision * recall / (beta2 * precision + recall)

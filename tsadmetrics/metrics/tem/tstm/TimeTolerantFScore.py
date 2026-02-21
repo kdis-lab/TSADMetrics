@@ -46,48 +46,46 @@ class TimeTolerantFScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="ttf", **kwargs)
 
+    @staticmethod
+    def _dilate_binary_mask(mask, radius):
+        n = int(mask.size)
+        if n == 0 or radius < 0:
+            return np.zeros(n, dtype=np.bool_)
+
+        indices = np.flatnonzero(mask)
+        if indices.size == 0:
+            return np.zeros(n, dtype=np.bool_)
+
+        left = np.maximum(0, indices - radius)
+        right = np.minimum(n - 1, indices + radius)
+
+        diff = np.zeros(n + 1, dtype=np.int32)
+        np.add.at(diff, left, 1)
+        np.add.at(diff, right + 1, -1)
+        return np.cumsum(diff[:-1], dtype=np.int64) > 0
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the time tolerant F-score (optimized version).
         """
-        t = self.params['t']
-        beta = self.params['beta']
-        
-        # Precompute masks for efficiency
-        true_anomalies = y_true == 1
-        predictions = y_pred == 1
-        
-        # Create P′1 for recall: for each true anomaly, check if any prediction within ±t
-        p_prime1 = np.zeros_like(y_true, dtype=bool)
-        
-        for i in np.where(true_anomalies)[0]:
-            start = max(0, i - t)
-            end = min(len(y_pred), i + t + 1)
-            if np.any(predictions[start:end]):
-                p_prime1[i] = True
-        
-        # Create P′2 for precision: for each prediction, check if any true anomaly within ±t
-        p_prime2 = np.zeros_like(y_pred, dtype=bool)
-        
-        for j in np.where(predictions)[0]:
-            start = max(0, j - t)
-            end = min(len(y_true), j + t + 1)
-            if np.any(true_anomalies[start:end]):
-                p_prime2[j] = True
-        
-        # Calculate recall using P′1
-        tp_recall = np.sum(true_anomalies & p_prime1)
-        fn_recall = np.sum(true_anomalies & ~p_prime1)
+        t = int(self.params["t"])
+        beta = float(self.params["beta"])
+
+        true_anomalies = np.asarray(y_true, dtype=np.bool_)
+        predictions = np.asarray(y_pred, dtype=np.bool_)
+
+        pred_dilated = self._dilate_binary_mask(predictions, t)
+        true_dilated = self._dilate_binary_mask(true_anomalies, t)
+
+        tp_recall = int(np.sum(true_anomalies & pred_dilated, dtype=np.int64))
+        fn_recall = int(np.sum(true_anomalies & ~pred_dilated, dtype=np.int64))
         recall = tp_recall / (tp_recall + fn_recall) if (tp_recall + fn_recall) > 0 else 0.0
-        
-        # Calculate precision using P′2  
-        tp_precision = np.sum(predictions & p_prime2)
-        fp_precision = np.sum(predictions & ~p_prime2)
+
+        tp_precision = int(np.sum(predictions & true_dilated, dtype=np.int64))
+        fp_precision = int(np.sum(predictions & ~true_dilated, dtype=np.int64))
         precision = tp_precision / (tp_precision + fp_precision) if (tp_precision + fp_precision) > 0 else 0.0
-        
-        # Calculate F-score
+
         if precision == 0 and recall == 0:
             return 0.0
-        
-        f_score = ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
-        return f_score
+
+        return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)

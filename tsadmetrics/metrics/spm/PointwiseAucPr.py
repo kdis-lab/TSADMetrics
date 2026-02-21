@@ -53,4 +53,4 @@ class PointwiseAucPr(Metric):
         """
 
         precision, recall, _ = precision_recall_curve(y_true, y_anomaly_scores)
-        return -np.sum(np.diff(recall) * np.array(precision)[:-1])
+        return float(np.dot(-np.diff(recall), precision[:-1]))

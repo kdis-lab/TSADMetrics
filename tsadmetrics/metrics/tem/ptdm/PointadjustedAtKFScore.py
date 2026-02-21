@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise, full_series_to_pointwise, pointwise_to_full_series
 
 class PointadjustedAtKFScore(Metric):
     """
@@ -53,6 +52,14 @@ class PointadjustedAtKFScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="pakf", **kwargs)
 
+    @staticmethod
+    def _segment_bounds(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0, append=0)
+        starts = np.flatnonzero(transitions == 1)
+        ends = np.flatnonzero(transitions == -1) - 1
+        return starts, ends
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the point-adjusted at K% F-score.
@@ -66,28 +73,31 @@ class PointadjustedAtKFScore(Metric):
         Returns:
             float: The point-adjusted at k F-score, which is the harmonic mean of precision and recall, adjusted by the beta value.
         """
+        adjusted_prediction = y_pred.copy()
+        starts, ends = self._segment_bounds(y_true)
+        k = float(self.params["k"])
 
-        adjusted_prediction = full_series_to_pointwise(y_pred).tolist()
-        for start, end in full_series_to_segmentwise(y_true):
-            correct_points = 0
-            for i in range(start, end + 1):
-                if i in adjusted_prediction:
-                    correct_points += 1
-                    if correct_points / (end + 1 - start) >= self.params['k']:
-                        for j in range(start, end + 1):
-                            adjusted_prediction.append(j)
-                        break
+        pred_prefix_sum = np.concatenate(
+            (np.array([0], dtype=np.int64), np.cumsum(y_pred, dtype=np.int64))
+        )
+        for start, end in zip(starts, ends):
+            segment_length = int(end - start + 1)
+            correct_points = int(pred_prefix_sum[end + 1] - pred_prefix_sum[start])
+            if correct_points > 0 and (correct_points / segment_length) >= k:
+                adjusted_prediction[start : end + 1] = 1
 
-        adjusted_prediction = pointwise_to_full_series(np.sort(np.unique(adjusted_prediction)), len(y_true))
-        tp = np.sum(adjusted_prediction * y_true)
-        fp = np.sum(adjusted_prediction * (1 - y_true))
-        fn = np.sum((1 - adjusted_prediction) * y_true)
+        tp = int(np.count_nonzero(np.logical_and(adjusted_prediction, y_true)))
+        true_positive_total = int(np.count_nonzero(y_true))
+        pred_positive_total = int(np.count_nonzero(adjusted_prediction))
+        fn = true_positive_total - tp
+        fp = pred_positive_total - tp
 
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
 
-        if precision == 0 or recall == 0:
-            return 0
+        if precision == 0.0 or recall == 0.0:
+            return 0.0
 
-        beta = self.params['beta']
-        return ((1 + beta**2) * precision * recall) / (beta**2 * precision + recall)
+        beta = float(self.params["beta"])
+        beta2 = beta * beta
+        return ((1.0 + beta2) * precision * recall) / (beta2 * precision + recall)

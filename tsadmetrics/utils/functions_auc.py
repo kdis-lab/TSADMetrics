@@ -154,24 +154,24 @@ def binary_clf_curve(y_true, y_score):
 
 
 
-    # make y_true a boolean vector
     y_true = y_true == 1
 
-    # sort scores and corresponding truth values
-    desc_score_indices = np.argsort(y_score, kind="mergesort")[::-1]
+    # Sorting dominates this computation. `quicksort` is faster than
+    # mergesort and tie order does not affect threshold-wise counts.
+    desc_score_indices = np.argsort(y_score, kind="quicksort")[::-1]
     y_score = y_score[desc_score_indices]
     y_true = y_true[desc_score_indices]
-    weight = 1.0
 
-    # y_score typically has many tied values. Here we extract
-    # the indices associated with the distinct values. We also
-    # concatenate a value for the end of the curve.
-    distinct_value_indices = np.where(np.diff(y_score))[0]
-    threshold_idxs = np.r_[distinct_value_indices, len(y_true) - 1]
-    
-    # accumulate the true positives with decreasing threshold
-    tps = stable_cumsum(y_true * weight)[threshold_idxs]
-    fps = 1 + threshold_idxs - tps
+    # y_score typically has many tied values. Here we extract the indices
+    # associated with distinct score values and append the last index.
+    distinct_value_indices = np.flatnonzero(np.diff(y_score))
+    threshold_idxs = np.concatenate(
+        (distinct_value_indices, np.array([len(y_true) - 1], dtype=distinct_value_indices.dtype))
+    )
+
+    # accumulate true positives with decreasing threshold
+    tps = np.cumsum(y_true, dtype=np.int64)[threshold_idxs].astype(np.float64, copy=False)
+    fps = threshold_idxs + 1 - tps
     return fps, tps, y_score[threshold_idxs]
 
 

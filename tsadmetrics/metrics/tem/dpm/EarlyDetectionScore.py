@@ -1,6 +1,5 @@
 from ....base.Metric import Metric
 import numpy as np
-from ....utils.functions_conversion import full_series_to_segmentwise
 
 class EarlyDetectionScore(Metric):
     """
@@ -48,6 +47,12 @@ class EarlyDetectionScore(Metric):
     def __init__(self, **kwargs):
         super().__init__(name="eds", **kwargs)
 
+    @staticmethod
+    def _segment_starts(series):
+        series_bool = np.asarray(series, dtype=np.bool_)
+        transitions = np.diff(series_bool.astype(np.int8), prepend=0)
+        return np.flatnonzero(transitions == 1)
+
     def _compute(self, y_true, y_pred):
         """
         Calculate the Early Detection (ED) score.
@@ -65,17 +70,17 @@ class EarlyDetectionScore(Metric):
         if n == 0:
             return 0.0
 
-        segs = full_series_to_segmentwise(y_true)
-        if len(segs) == 0:
+        starts = self._segment_starts(y_true)
+        if starts.size == 0:
             return 0.0
-        win_len = int(max(1, round(0.1 * n / len(segs))))
+        win_len = int(max(1, round(0.1 * n / starts.size)))
 
-        ed_values = []
+        ed_sum = 0.0
+        pred_idxs = np.flatnonzero(y_pred)
+        pred_count = int(pred_idxs.size)
+        pred_ptr = 0
 
-        pred_idxs = np.flatnonzero(y_pred == 1)
-
-        for (s, e) in segs:
-            a = s
+        for a in starts:
 
             half = win_len // 2
             tb = max(0, a - half)
@@ -85,15 +90,15 @@ class EarlyDetectionScore(Metric):
                 tb = max(0, te - (win_len - 1))
 
             if te < tb:
-                ed_values.append(0.0)
                 continue
 
-            in_window = pred_idxs[(pred_idxs >= tb) & (pred_idxs <= te)]
-            if in_window.size == 0:
-                ed_values.append(0.0)
+            while pred_ptr < pred_count and int(pred_idxs[pred_ptr]) < tb:
+                pred_ptr += 1
+
+            if pred_ptr >= pred_count or int(pred_idxs[pred_ptr]) > te:
                 continue
 
-            pos = int(in_window[0])  
+            pos = int(pred_idxs[pred_ptr])
 
             denom = te - tb
             if denom <= 0:
@@ -101,10 +106,6 @@ class EarlyDetectionScore(Metric):
             else:
                 ed_a = 1.0 - (pos - tb) / denom
 
-            ed_a = float(np.clip(ed_a, 0.0, 1.0))
-            ed_values.append(ed_a)
+            ed_sum += float(np.clip(ed_a, 0.0, 1.0))
 
-        if len(ed_values) == 0:
-            return 0.0
-
-        return float(np.mean(ed_values))
+        return float(ed_sum / starts.size)
