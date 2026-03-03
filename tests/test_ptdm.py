@@ -65,6 +65,16 @@ class TestAverageDetectionCount(unittest.TestCase):
         except Exception as e:
             self.fail(f"AverageDetectionCount raised an exception {e}")
 
+    def test_no_anomalies(self):
+        metric = AverageDetectionCount()
+        y_true = np.zeros(32, dtype=int)
+
+        self.assertAlmostEqual(metric.compute(y_true, np.zeros(32, dtype=int)), 1.0, places=6)
+
+        y_pred = np.zeros(32, dtype=int)
+        y_pred[[3, 12, 25]] = 1
+        self.assertAlmostEqual(metric.compute(y_true, y_pred), 0.0, places=6)
+
 
 class TestDetectionAccuracyInRange(unittest.TestCase):
 
@@ -363,24 +373,30 @@ class TestWeightedDetectionDifference(unittest.TestCase):
     def test(self):
         metric = WeightedDetectionDifference(k=3)
         score = round(metric.compute(self.y_true1, self.y_pred1),2)
-        expected_score = 18.89
+        expected_score = 6.86
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true1, self.y_pred2),2)
-        expected_score = 24.89
+        expected_score = 1.36
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true2, self.y_pred21),2)
-        expected_score = 15.73
+        expected_score = 4.30
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true2, self.y_pred22),2)
-        expected_score = 16.73
+        expected_score = 3.53
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true1, self.y_pred3),2)
-        expected_metric = 10
-        self.assertGreater(score, expected_metric)
+        expected_metric = 13.72
+        self.assertAlmostEqual(score, expected_metric, places=4)
+        self.assertGreater(score, metric.compute(self.y_true1, self.y_pred1))
+        self.assertGreater(score, metric.compute(self.y_true1, self.y_pred2))
+
+        perfect_score_y_true2 = metric.compute(self.y_true2, self.y_true2)
+        self.assertGreater(perfect_score_y_true2, metric.compute(self.y_true2, self.y_pred21))
+        self.assertGreater(perfect_score_y_true2, metric.compute(self.y_true2, self.y_pred22))
 
         score = round(metric.compute(self.y_true1, self.y_pred4),2)
         expected_metric = 0

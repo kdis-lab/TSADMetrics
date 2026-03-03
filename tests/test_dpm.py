@@ -199,6 +199,16 @@ class TestMeanTimeToDetect(unittest.TestCase):
         except Exception as e:
             self.fail(f"MeanTimeToDetect raised an exception {e}")
 
+    def test_no_anomalies(self):
+        metric = MeanTimeToDetect()
+        y_true = np.zeros(32, dtype=int)
+
+        self.assertAlmostEqual(metric.compute(y_true, np.zeros(32, dtype=int)), 0.0, places=6)
+
+        y_pred = np.zeros(32, dtype=int)
+        y_pred[[4, 10, 20]] = 1
+        self.assertAlmostEqual(metric.compute(y_true, y_pred), 0.0, places=6)
+
 
 class TestNabScore(unittest.TestCase):
 

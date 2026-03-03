@@ -51,7 +51,7 @@ class AverageDetectionCount(Metric):
         """
         starts, ends = self._segment_bounds(y_true)
         if starts.size == 0:
-            return float(np.mean(np.array([], dtype=float)))
+            return 1.0 if np.count_nonzero(y_pred) == 0 else 0.0
 
         pred_prefix_sum = np.concatenate(
             (np.array([0], dtype=np.int64), np.cumsum(y_pred, dtype=np.int64))

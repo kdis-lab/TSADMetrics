@@ -1,6 +1,6 @@
 [project]
 name = "tsadmetrics"
-version = "1.0.10"
+version = "1.0.11"
 description = "Librería para evaluación de detección de anomalías en series temporales"
 license = { file = "LICENSE" }
 readme = "README.md"
@@ -28,9 +28,17 @@ dev = [
     "myst-parser"
 ]
 
+[tool.setuptools]
+include-package-data = false
+
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["tsadmetrics*"]
 exclude = ["tests*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+tsadmetrics = ["py.typed", "config/*.yaml"]
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel", "build"]

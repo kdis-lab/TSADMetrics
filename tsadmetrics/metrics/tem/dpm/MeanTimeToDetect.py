@@ -52,6 +52,9 @@ class MeanTimeToDetect(Metric):
             float: The mean time to detect.
         """
         starts = self._segment_starts(y_true)
+        if starts.size == 0:
+            return 0.0
+
         pred_idxs = np.flatnonzero(y_pred)
         pred_count = int(pred_idxs.size)
         t_sum = 0
