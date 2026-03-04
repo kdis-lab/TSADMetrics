@@ -50,8 +50,7 @@ class AbsoluteDetectionDistance(Metric):
         """
         starts, ends = self._segment_bounds(y_true)
         a_points = np.flatnonzero(y_pred)
-        point_count = int(a_points.size)
-        if point_count == 0:
+        if a_points.size == 0:
             return 0
 
         if starts.size == 0:
@@ -62,11 +61,13 @@ class AbsoluteDetectionDistance(Metric):
         )
 
         distance = 0.0
+        matched_point_count = 0
         for start, end in zip(starts, ends):
             left = int(np.searchsorted(a_points, start, side="left"))
             right = int(np.searchsorted(a_points, end, side="right"))
             if left >= right:
                 continue
+            matched_point_count += right - left
 
             center = int((int(start) + int(end)) / 2)
             norm = max(1, center)
@@ -83,4 +84,6 @@ class AbsoluteDetectionDistance(Metric):
             right_contrib = right_sum - center * right_count
             distance += (left_contrib + right_contrib) / norm
 
-        return distance / point_count
+        if matched_point_count == 0:
+            return 0.0
+        return distance / matched_point_count

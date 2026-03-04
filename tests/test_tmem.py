@@ -123,6 +123,18 @@ class TestAbsoluteDetectionDistance(unittest.TestCase):
         expected_metric = 0 
         self.assertAlmostEqual(score, expected_metric, places=4)
 
+    def test_false_positives_outside_real_events_do_not_affect_denominator(self):
+        metric = AbsoluteDetectionDistance()
+        y_true = np.array([0,0,0,0,1,1,1,0,0,0,0,0])
+        y_pred_match = np.array([0,0,0,0,1,0,0,0,0,0,0,0])
+        y_pred_with_fp = np.array([1,1,1,0,1,0,0,0,0,0,1,1])
+
+        score_match = metric.compute(y_true, y_pred_match)
+        score_with_fp = metric.compute(y_true, y_pred_with_fp)
+
+        self.assertAlmostEqual(score_match, 0.2, places=4)
+        self.assertAlmostEqual(score_with_fp, score_match, places=4)
+
         
     def testconsistency(self):
         try:
@@ -194,5 +206,4 @@ class TestEnhancedTimeseriesAwareFScore(unittest.TestCase):
                 f_score = metric.compute(y_true, y_pred)
         except Exception as e:
             self.fail(f"EnhancedTimeseriesAwareFScore raised an exception {e}")
-
 
