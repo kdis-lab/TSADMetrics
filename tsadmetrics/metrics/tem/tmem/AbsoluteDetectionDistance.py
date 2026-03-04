@@ -5,10 +5,10 @@ class AbsoluteDetectionDistance(Metric):
     """
     Calculate absolute detection distance for anomaly detection in time series.
 
-    This metric computes, for each predicted anomaly point that overlaps a ground-truth anomaly segment, 
-    the relative distance from that point to the temporal center of the corresponding segment. It then sums all 
-    those distances and divides by the total number of such matching predicted points, yielding the 
-    mean distance to segment centers for correctly detected points.
+    This metric computes, for each predicted anomaly point that overlaps a ground-truth anomaly
+    segment, the distance from that point to the temporal center of the corresponding segment,
+    normalized by the segment length. It then averages those normalized distances over the
+    predicted anomaly points that correctly overlap a real anomaly event.
 
     Reference:
         For more information, see the original paper:
@@ -70,7 +70,7 @@ class AbsoluteDetectionDistance(Metric):
             matched_point_count += right - left
 
             center = int((int(start) + int(end)) / 2)
-            norm = max(1, center)
+            norm = max(1, int(end) - int(start) + 1)
 
             mid = int(np.searchsorted(a_points, center, side="right"))
             mid = max(left, min(mid, right))
@@ -82,7 +82,7 @@ class AbsoluteDetectionDistance(Metric):
 
             left_contrib = center * left_count - left_sum
             right_contrib = right_sum - center * right_count
-            distance += (left_contrib + right_contrib) / norm
+            distance += (left_contrib + right_contrib) / float(norm)
 
         if matched_point_count == 0:
             return 0.0

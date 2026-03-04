@@ -1,6 +1,6 @@
 [project]
 name = "tsadmetrics"
-version = "1.0.13"
+version = "1.0.14"
 description = "Librería para evaluación de detección de anomalías en series temporales"
 license = { file = "LICENSE" }
 readme = "README.md"

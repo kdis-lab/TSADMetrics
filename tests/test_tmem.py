@@ -104,19 +104,19 @@ class TestAbsoluteDetectionDistance(unittest.TestCase):
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true1, self.y_pred2),2)
-        expected_score = 0.25
+        expected_score = 0.38
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true2, self.y_pred21),2)
-        expected_score = 0.06
+        expected_score = 0.24
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true2, self.y_pred22),2)
-        expected_score = 0.12
+        expected_score = 0.25
         self.assertAlmostEqual(score, expected_score, places=4)
 
         score = round(metric.compute(self.y_true1, self.y_pred3),2)
-        expected_metric = 0.17 #The mean of the distances is never 0
+        expected_metric = 0.25 #The mean of the distances is never 0
         self.assertAlmostEqual(score, expected_metric, places=4)
 
         score = round(metric.compute(self.y_true1, self.y_pred4),2)
@@ -132,8 +132,20 @@ class TestAbsoluteDetectionDistance(unittest.TestCase):
         score_match = metric.compute(y_true, y_pred_match)
         score_with_fp = metric.compute(y_true, y_pred_with_fp)
 
-        self.assertAlmostEqual(score_match, 0.2, places=4)
+        self.assertAlmostEqual(score_match, 1.0 / 3.0, places=4)
         self.assertAlmostEqual(score_with_fp, score_match, places=4)
+
+    def test_same_relative_position_has_same_score_after_time_shift(self):
+        metric = AbsoluteDetectionDistance()
+        y_true_early = np.array([0,0,0,1,1,1,1,1,0,0,0,0])
+        y_pred_early = np.array([0,0,0,1,0,0,0,0,0,0,0,0])
+        y_true_late = np.array([0,0,0,0,0,0,1,1,1,1,1,0])
+        y_pred_late = np.array([0,0,0,0,0,0,1,0,0,0,0,0])
+
+        score_early = metric.compute(y_true_early, y_pred_early)
+        score_late = metric.compute(y_true_late, y_pred_late)
+
+        self.assertAlmostEqual(score_early, score_late, places=4)
 
         
     def testconsistency(self):
@@ -206,4 +218,3 @@ class TestEnhancedTimeseriesAwareFScore(unittest.TestCase):
                 f_score = metric.compute(y_true, y_pred)
         except Exception as e:
             self.fail(f"EnhancedTimeseriesAwareFScore raised an exception {e}")
-
