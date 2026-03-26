@@ -1,0 +1,35 @@
+metric,category,input,Class,a,R²
+dicec,SPM,bin.,O(n),0.00000003,0.99976117
+pak,SPM,cont.,O(n),0.00000003,0.98550448
+pw_auc_pr,SPM,cont.,O(n log n),0.00000001,0.99996429
+pw_auc_roc,SPM,cont.,O(n log n),0.00000001,0.99833886
+pwf,SPM,bin.,O(n),0.00000003,0.98965552
+bpaf,TPDM,bin.,O(n),0.00000011,0.99997459
+cf,TPDM,bin.,O(n),0.00000051,0.99998506
+pa_auc_pr,TPDM,cont.,O(n),0.00002485,0.99995104
+pa_auc_roc,TPDM,cont.,O(n),0.00002448,0.99993975
+paf,TPDM,bin.,O(n),0.00000009,0.99993323
+rbf,TPDM,bin.,O(n^2),0.00000000,0.99995327
+swf,TPDM,bin.,O(n),0.00000006,0.99838889
+adc,PTDM,bin.,O(n),0.00000004,0.99681507
+dair,PTDM,bin.,O(n log n),0.00000001,0.99982566
+pakf,PTDM,bin.,O(n log n),0.00000000,0.99549802
+paklf,PTDM,bin.,O(n),0.00000023,0.99998577
+taf,PTDM,bin.,O(n^2),0.00000000,0.99995114
+tdir,PTDM,bin.,O(n log n),0.00000001,0.99971430
+wdd,PTDM,bin.,O(n),0.00000850,0.99941743
+dtpaf,DPM,bin.,O(n),0.00000004,0.99990579
+eds,DPM,bin.,O(n),0.00000011,0.99970394
+lsaf,DPM,bin.,O(n),0.00000011,0.99994927
+mttd,DPM,bin.,O(n),0.00000006,0.99987390
+nab_score,DPM,bin.,O(n^2),0.00000000,0.99981269
+add,TMEM,bin.,O(n),0.00000011,0.99982766
+etaf,TMEM,bin.,O(n^2),0.00000000,0.99994719
+td,TMEM,bin.,O(n),0.00000052,0.99996432
+aff_f,TSTM,bin.,O(n^2),0.00000000,0.99991067
+naff_f,TSTM,bin.,O(n^2),0.00000000,0.99992676
+pate,TSTM,cont.,O(n^2),0.00000157,0.99997396
+pate_f1,TSTM,bin.,O(n^2),0.00000000,0.99999902
+ttf,TSTM,bin.,O(n),0.00000010,0.99994969
+vus_pr,TSTM,cont.,O(n),0.00013892,0.99992489
+vus_roc,TSTM,cont.,O(n),0.00013883,0.99993617

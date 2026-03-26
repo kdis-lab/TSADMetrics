@@ -1,0 +1,16 @@
+dataset,model,model_kind,supervision,implementation_library,enabled,trials_requested,trials_completed,best_value,runtime_sec,best_params,status,reason,best_params_json
+MetroPT3,ECOD,pyod_ecod,unsupervised,pyod,False,10,0,,0.0,{},skipped,model_not_tunable,{}
+MetroPT3,KNN,knn,supervised,scikit-learn,True,10,10,0.980720871751886,2.393508142000428,"{'n_neighbors': 13, 'p': 1, 'weights': 'uniform'}",optimized,,"{""n_neighbors"": 13, ""p"": 1, ""weights"": ""uniform""}"
+MetroPT3,RBFSVC,rbf_svc,supervised,scikit-learn,True,10,10,0.9831365935919056,6.943714793998879,"{'C': 0.1347901151236176, 'gamma': 0.0453095012866193}",optimized,,"{""C"": 0.1347901151236176, ""gamma"": 0.0453095012866193}"
+MetroPT3,RandomForest,rf,supervised,scikit-learn,True,10,10,0.981450252951096,8.195555116000833,"{'max_depth': 24, 'max_features': 'sqrt', 'min_samples_leaf': 5, 'n_estimators': 150}",optimized,,"{""max_depth"": 24, ""max_features"": ""sqrt"", ""min_samples_leaf"": 5, ""n_estimators"": 150}"
+MetroPT3,XGBOD,pyod_xgbod,supervised,pyod+xgboost,False,10,0,,0.0,{},skipped,model_not_tunable,{}
+Exathlon,ECOD,pyod_ecod,unsupervised,pyod,False,10,0,,0.0,{},skipped,model_not_tunable,{}
+Exathlon,KNN,knn,supervised,scikit-learn,True,10,10,0.9192462987886943,35.61751238400029,"{'n_neighbors': 35, 'p': 1, 'weights': 'uniform'}",optimized,,"{""n_neighbors"": 35, ""p"": 1, ""weights"": ""uniform""}"
+Exathlon,RBFSVC,rbf_svc,supervised,scikit-learn,True,10,10,0.9534426229508196,417.9550513189988,"{'C': 0.34103949141133166, 'gamma': 0.0001013690581899058}",optimized,,"{""C"": 0.34103949141133166, ""gamma"": 0.0001013690581899058}"
+Exathlon,RandomForest,rf,supervised,scikit-learn,True,10,10,0.9656513285806868,150.2010295129985,"{'max_depth': 12, 'max_features': 0.5, 'min_samples_leaf': 4, 'n_estimators': 150}",optimized,,"{""max_depth"": 12, ""max_features"": 0.5, ""min_samples_leaf"": 4, ""n_estimators"": 150}"
+Exathlon,XGBOD,pyod_xgbod,supervised,pyod+xgboost,False,10,0,,0.0,{},skipped,model_not_tunable,{}
+Occupancy,ECOD,pyod_ecod,unsupervised,pyod,False,10,0,,0.0,{},skipped,model_not_tunable,{}
+Occupancy,KNN,knn,supervised,scikit-learn,True,10,10,0.960692871419054,1.2462467749992356,"{'n_neighbors': 13, 'p': 1, 'weights': 'uniform'}",optimized,,"{""n_neighbors"": 13, ""p"": 1, ""weights"": ""uniform""}"
+Occupancy,RBFSVC,rbf_svc,supervised,scikit-learn,True,10,10,0.9785809906291834,6.729195846999573,"{'C': 14.30162876812465, 'gamma': 0.00061033524986543}",optimized,,"{""C"": 14.30162876812465, ""gamma"": 0.00061033524986543}"
+Occupancy,RandomForest,rf,supervised,scikit-learn,True,10,10,0.9785809906291834,5.52949905099922,"{'max_depth': 4, 'max_features': 1.0, 'min_samples_leaf': 12, 'n_estimators': 400}",optimized,,"{""max_depth"": 4, ""max_features"": 1.0, ""min_samples_leaf"": 12, ""n_estimators"": 400}"
+Occupancy,XGBOD,pyod_xgbod,supervised,pyod+xgboost,False,10,0,,0.0,{},skipped,model_not_tunable,{}

@@ -1,0 +1,27 @@
+metric,input_type,lower_is_better,taxonomy_root,taxonomy_leaf,taxonomy_path,configured_params_json
+dtpaf,binary,False,TEM,DPM,TEM/DPM,"{""beta"": 1.00000000, ""k"": 1}"
+eds,binary,False,TEM,DPM,TEM/DPM,{}
+lsaf,binary,False,TEM,DPM,TEM/DPM,"{""beta"": 1.00000000, ""ni"": 4}"
+mttd,binary,True,TEM,DPM,TEM/DPM,{}
+nab_score,binary,False,TEM,DPM,TEM/DPM,{}
+adc,binary,False,TEM,PTDM,TEM/PTDM,{}
+dair,binary,False,TEM,PTDM,TEM/PTDM,"{""k"": 5}"
+pakf,binary,False,TEM,PTDM,TEM/PTDM,"{""beta"": 1.00000000, ""k"": 0.50000000}"
+paklf,binary,False,TEM,PTDM,TEM/PTDM,"{""beta"": 1.00000000, ""k"": 0.50000000, ""l"": 2}"
+taf,binary,False,TEM,PTDM,TEM/PTDM,"{""alpha"": 0.40000000, ""beta"": 1.00000000, ""delta"": 4, ""past_range"": false, ""theta"": 0.65000000}"
+tdir,binary,False,TEM,PTDM,TEM/PTDM,"{""k"": 5}"
+wdd,binary,False,TEM,PTDM,TEM/PTDM,"{""k"": 5}"
+dicec,binary,False,SPM,SPM,SPM,{}
+pwf,binary,False,SPM,SPM,SPM,"{""beta"": 1.00000000}"
+add,binary,True,TEM,TMEM,TEM/TMEM,{}
+etaf,binary,False,TEM,TMEM,TEM/TMEM,"{""theta_p"": 0.50000000, ""theta_r"": 0.50000000}"
+td,binary,True,TEM,TMEM,TEM/TMEM,"{""distance"": 0}"
+bpaf,binary,False,TEM,TPDM,TEM/TPDM,"{""beta"": 1.00000000, ""w"": 5}"
+cf,binary,False,TEM,TPDM,TEM/TPDM,"{""beta"": 1.00000000}"
+paf,binary,False,TEM,TPDM,TEM/TPDM,"{""beta"": 1.00000000}"
+rbf,binary,False,TEM,TPDM,TEM/TPDM,"{""beta"": 1.00000000, ""cardinality_mode"": ""reciprocal"", ""p_alpha"": 0.30000000, ""p_bias"": ""front"", ""r_alpha"": 0.30000000, ""r_bias"": ""front""}"
+swf,binary,False,TEM,TPDM,TEM/TPDM,"{""beta"": 1.00000000}"
+aff_f,binary,False,TEM,TSTM,TEM/TSTM,"{""beta"": 1.00000000}"
+naff_f,binary,False,TEM,TSTM,TEM/TSTM,"{""alpha"": 0.30000000, ""beta"": 1.00000000}"
+pate_f1,binary,False,TEM,TSTM,TEM/TSTM,"{""delay"": 9, ""early"": 9}"
+ttf,binary,False,TEM,TSTM,TEM/TSTM,"{""beta"": 1.00000000, ""t"": 9}"

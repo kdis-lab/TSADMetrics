@@ -1,0 +1,2 @@
+study_scope,metric,parameter,value,reason
+general_metric_behaviour_and_correlation,naff_f,alpha,0.3,Avoid equivalence with aff_f when alpha=0.0 and preserve adjusted behaviour.
