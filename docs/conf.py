@@ -3,7 +3,10 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+
+CONF_DIR = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(CONF_DIR, ".."))
+sys.path.insert(0, PROJECT_ROOT)
 
 
 project = 'TSADmetrics'
