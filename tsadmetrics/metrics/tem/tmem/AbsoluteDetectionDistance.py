@@ -1,6 +1,6 @@
 from ....base.Metric import Metric
 import numpy as np
-
+import warnings
 class AbsoluteDetectionDistance(Metric):
     """
     Calculate absolute detection distance for anomaly detection in time series.
@@ -9,6 +9,13 @@ class AbsoluteDetectionDistance(Metric):
     segment, the distance from that point to the temporal center of the corresponding segment,
     normalized by the segment length. It then averages those normalized distances over the
     predicted anomaly points that correctly overlap a real anomaly event.
+
+    
+    If there are no predicted anomaly points, the metric returns ``0.0``
+    because there are no detections for which a distance to the center of a
+    ground-truth anomaly segment can be computed. In this edge case, ``0.0``
+    should be interpreted as the absence of computable detections, not as a
+    perfectly centered detection.
 
     Reference:
         For more information, see the original paper:
@@ -85,5 +92,11 @@ class AbsoluteDetectionDistance(Metric):
             distance += (left_contrib + right_contrib) / float(norm)
 
         if matched_point_count == 0:
+            warnings.warn(
+                "No predicted anomaly points overlap any ground-truth anomaly segment. "
+                "Returning 0.0 for AbsoluteDetectionDistance.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             return 0.0
         return distance / matched_point_count

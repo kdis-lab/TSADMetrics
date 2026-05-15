@@ -29,7 +29,7 @@ class EarlyDetectionScore(Metric):
 
     Reference:
         For more information, see the original paper:
-            https://ieeexplore.ieee.org/document/7987370
+            https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7987310
 
     Attributes:
         name (str):

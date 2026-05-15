@@ -1,20 +1,40 @@
 from ....base.Metric import Metric
 import numpy as np
+import warnings
 
 class MeanTimeToDetect(Metric):
     """
     Calculate mean time to detect for anomaly detection in time series.
     
-    This metric quantifies the average detection delay across all true anomaly events.  
-    For each ground-truth anomaly segment, let i be the index where the segment starts, 
-    and let :math:`{j \\geq i}` be the first index within that segment where the model predicts an anomaly.  
+    This metric quantifies the average delay between the start of each
+    ground-truth anomaly segment and the first predicted anomaly point that
+    appears at or after that start index.
+
+    For each ground-truth anomaly segment, let i be the index where the
+    segment starts. The implementation searches for the first index j such
+    that :math:`{j \\geq i}` and the model predicts an anomaly at j. The predicted
+    anomaly point j does not need to fall inside the corresponding ground-truth
+    anomaly segment.
+
     The detection delay for that event is defined as:
 
     .. math::
         \\Delta t = j - i
 
-    The MTTD is the mean of all such :math:`{\\Delta t}` values, one per true anomaly segment, and expresses 
-    the average number of time steps between the true onset of an anomaly and its first detection.
+    The returned MTTD is computed as the sum of the detection delays found for
+    matched ground-truth anomaly starts, divided by the total number of
+    ground-truth anomaly segments.
+
+    Ground-truth anomaly segments with no predicted anomaly point at or after
+    their start do not add any delay to the numerator, but they are still included
+    in the denominator. Therefore, missed anomaly segments are not penalized with
+    an increased delay.
+
+    If no predicted anomaly points are found at or after any
+    ground-truth anomaly start, the metric emits a warning and returns ``0.0`` as
+    a fallback value for an undefined/non-informative delay. In this edge case,
+    ``0.0`` should be interpreted as the absence of computable detections, not as
+    immediate detection.
 
     Reference:
         For more information, see the original paper:
@@ -58,9 +78,18 @@ class MeanTimeToDetect(Metric):
         pred_idxs = np.flatnonzero(y_pred)
         pred_count = int(pred_idxs.size)
         t_sum = 0
+        matched_segment_count = 0
         for a in starts:
             idx = int(np.searchsorted(pred_idxs, a, side="left"))
             if idx < pred_count:
                 t_sum += int(pred_idxs[idx]) - int(a)
-
+                matched_segment_count += 1
+        if matched_segment_count == 0:
+            warnings.warn(
+                "No predicted anomaly points were found at or after any ground-truth anomaly start. "
+                "Returning 0.0 for MeanTimeToDetect.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return 0.0
         return t_sum / len(starts)
