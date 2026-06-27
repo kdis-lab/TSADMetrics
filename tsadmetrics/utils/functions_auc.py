@@ -3,6 +3,12 @@ import warnings
 from functools import partial
 
 
+def _trapezoid(y, x):
+    if hasattr(np, "trapezoid"):
+        return np.trapezoid(y, x)
+    return np.trapz(y, x)
+
+
 def average_binary_score(binary_metric, y_true, y_score):
     """Average a binary metric for multilabel classification.
 
@@ -85,7 +91,7 @@ def auc(x, y):
         else:
             raise ValueError("x is neither increasing nor decreasing : {}.".format(x))
 
-    area = direction * np.trapz(y, x)
+    area = direction * _trapezoid(y, x)
     if isinstance(area, np.memmap):
         # Reductions such as .sum used internally in trapezoid do not return a
         # scalar by default for numpy.memmap instances contrary to

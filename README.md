@@ -99,7 +99,20 @@ TSADmetrics includes 34 metrics, organized according to the proposed taxonomy fo
 This library was supported in part by the PID2023-148396NB-I00 project of Spanish Ministry of Science and Innovation and the European Regional Development Fund, by the ProyExcel-0069 project of the Andalusian University, Research and Innovation Department.
 
 ## Citation
-<>
+If TSADmetrics has been useful to you, and you would like to cite it in a scientific publication, please refer to the [paper](https://doi.org/10.1016/j.neucom.2026.134154) published in *Neurocomputing*:
+
+```bibtex
+@article{velasco2026tsadmetrics,
+  author = {Velasco, Pedro R. and Zafra, Amelia},
+  title = {TSADmetrics: A library for evaluating time series anomaly detection methods},
+  journal = {Neurocomputing},
+  volume = {698},
+  pages = {134154},
+  year = {2026},
+  doi = {10.1016/j.neucom.2026.134154},
+  url = {https://doi.org/10.1016/j.neucom.2026.134154}
+}
+```
 
 ## References
 This library is based on the concepts and implementations from:  
@@ -112,5 +125,4 @@ The tools is free and open source, under the GNU General Public GPLv3 license.
 ## Reporting bugs
 
 Feel free to open an issue at Github if anything is not working as expected. Merge request are also encouraged, it will be carefully reviewed and merged if everything is all right.
-
 
