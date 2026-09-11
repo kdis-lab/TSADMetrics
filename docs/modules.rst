@@ -34,6 +34,8 @@ Registry
 Metric Types
 ------------
 
+.. _api-spm:
+
 Single-Point Based Metrics (SPM)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 These metrics evaluate predictions by considering each point independently, without taking into account the temporal context in which anomalies occur. In other words, they treat each instant in isolation, ignoring the continuity or structure of anomalies over time.
@@ -49,6 +51,8 @@ Temporal Evaluation Metrics (TEM)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This category includes metrics that incorporate temporal context in the evaluation process. They consider not only whether an anomaly was detected, but also when and how it occurred relative to the original sequence. These metrics are specifically designed for time series anomaly detection and are particularly useful for analyzing one or more properties of the model related to the temporal structure of anomalies, such as their duration, anticipation, coverage, or overlap.
 
+.. _api-tpdm:
+
 Tolerant Partial Detection Metrics (TPDM)
 """""""""""""""""""""""""""""""""""""""""
 These metrics consider a predicted anomaly valid if it occurs at any point within the interval of a real anomaly. They assume that partial detection is sufficient to signal a potential anomaly, allowing further verification.
@@ -59,6 +63,8 @@ These metrics consider a predicted anomaly valid if it occurs at any point withi
    :show-inheritance:
    :exclude-members: param_schema, binary_prediction, name
 
+
+.. _api-ptdm:
 
 Precise Temporal Detection Metrics (PTDM)
 """""""""""""""""""""""""""""""""""""""""
@@ -71,6 +77,8 @@ These metrics require the predicted anomaly to cover a significant portion of th
    :exclude-members: param_schema, binary_prediction, name
 
 
+.. _api-tmem:
+
 Temporal Matching Evaluation Metrics (TMEM)  
 """""""""""""""""""""""""""""""""""""""""""
 These metrics measure how well real and predicted anomalies are aligned, penalizing temporal deviations in start, duration, or end of the events.
@@ -81,6 +89,8 @@ These metrics measure how well real and predicted anomalies are aligned, penaliz
    :show-inheritance:
    :exclude-members: param_schema, binary_prediction, name
 
+
+.. _api-dpm:
 
 Delay-Penalized Metrics (DPM)
 """""""""""""""""""""""""""""
@@ -93,6 +103,8 @@ These metrics penalize predictions that occur significantly after the real anoma
    :exclude-members: param_schema, binary_prediction, name
 
 
+.. _api-tstm:
+
 Temporal Shift-Tolerant Metrics (TSTM)
 """"""""""""""""""""""""""""""""""""""
 These metrics allow a temporal tolerance in detecting an anomaly, considering predictions correct if they occur near the real event, even if they do not exactly match its start or end. This flexibility is useful when exact timing is less critical, but detection within a reasonable window is important.
@@ -102,4 +114,3 @@ These metrics allow a temporal tolerance in detecting an anomaly, considering pr
    :undoc-members:
    :show-inheritance:
    :exclude-members: param_schema, binary_prediction, name
-

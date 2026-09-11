@@ -1,10 +1,12 @@
 
 
-Specific Metric Usage
-=====================
+Metric-Specific Examples
+========================
 
 This page provides simple, copy-pasteable examples for using individual metrics.
 Each section below shows how to use one metric directly and with the Runner.
+
+.. _specific-spm:
 
 SPM Metrics
 -----------
@@ -145,6 +147,8 @@ PointwiseAucPr
     runner = Runner(dataset_evaluations, metrics)
     results = runner.run()
     print(results)
+
+.. _specific-tpdm:
 
 MET Metrics
 -----------
@@ -357,6 +361,8 @@ PointadjustedFScore
     results = runner.run()
     print(results)
 
+.. _specific-ptdm:
+
 PTDM Metrics
 ~~~~~~~~~~~~
 
@@ -565,6 +571,8 @@ WeightedDetectionDifference
     results = runner.run()
     print(results)
 
+.. _specific-tmem:
+
 TMEM Metrics
 ~~~~~~~~~~~~
 
@@ -670,6 +678,8 @@ EnhancedTimeseriesAwareFScore
     runner = Runner(dataset_evaluations, metrics)
     results = runner.run()
     print(results)
+
+.. _specific-dpm:
 
 DPM metrics
 ~~~~~~~~~~~
@@ -810,6 +820,8 @@ NabScore
     runner = Runner(dataset_evaluations, metrics)
     results = runner.run()
     print(results)
+
+.. _specific-tstm:
 
 TSTM Metrics
 ~~~~~~~~~~~~
