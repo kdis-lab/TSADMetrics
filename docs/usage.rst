@@ -1,5 +1,5 @@
-Using TSADmetrics
-=================
+Large-Scale Evaluation and Experiment Configuration
+===================================================
 
 This guide shows how to use the **TSADmetrics** library for evaluating time series anomaly detection algorithms.
 It includes examples using the `Runner` class for evaluating datasets with multiple metrics.
@@ -127,8 +127,8 @@ You can define the entire evaluation through a single global configuration file.
     results = runner.run(generate_report=True, report_file="./example_output/example_global_config_file_report.csv")
     print(results)
 
-Direct Metric Usage
--------------------
+Example: Direct Metric Usage
+----------------------------
 
 You can also use metrics directly by instantiating the metric class and calling the `compute` method.
 
