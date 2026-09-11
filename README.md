@@ -1,7 +1,7 @@
 # TSADmetrics - Time Series Anomaly Detection Metrics
 
 **TSADmetrics** is a Python library for evaluating anomaly detection algorithms in time series data.  
-It provides a comprehensive set of metrics specifically designed to handle the temporal nature of anomalies.
+It provides a comprehensive set of metrics specifically designed to handle the temporal nature of anomalies. These metrics are organized into a taxonomy according to the temporal characteristics they evaluate, including point-wise performance, event coverage, temporal alignment, detection delay, and tolerance to temporal shifts. A detailed description is available in the [Metric taxonomy](https://tsadmetrics.readthedocs.io/en/latest/taxonomy.html) section of the online documentation.
 
 ---
 
@@ -125,4 +125,3 @@ The tools is free and open source, under the GNU General Public GPLv3 license.
 ## Reporting bugs
 
 Feel free to open an issue at Github if anything is not working as expected. Merge request are also encouraged, it will be carefully reviewed and merged if everything is all right.
-
