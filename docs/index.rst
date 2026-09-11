@@ -19,7 +19,6 @@ Documentation Contents
    quickstart
    taxonomy
    data_and_predictions
-   uninstallation
    usage
 
 .. toctree::
