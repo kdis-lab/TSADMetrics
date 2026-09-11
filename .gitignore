@@ -4,6 +4,7 @@ notes.txt
 pytest.ini
 dist/
 build/
+docs/_build/
 *.egg-info/
 script_doc.py
 docs/plots
@@ -11,4 +12,4 @@ docs/_add_docs
 env/
 notes.txt
 experiments
-experiments/metric_regression_guard/
+scripts/
