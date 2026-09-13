@@ -87,7 +87,7 @@ class TimeseriesAwareFScore(Metric):
             end_id = end_id = start_id + delta
 
             if past_range:
-                end_id = start_id + int(delta * (y_true_sw[i][1] - y_true_sw[0]))
+                end_id = start_id + int(delta * (y_true_sw[i][1] - y_true_sw[i][0]))
             
             #if the next anomaly occurs during the theta, update the end_id
             if i+1 < len(y_true_sw) and end_id > y_true_sw[i+1][0]:
