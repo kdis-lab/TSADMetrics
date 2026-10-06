@@ -272,6 +272,12 @@ class TestTimeseriesAwareFScore(unittest.TestCase):
         expected_metric = 0
         self.assertAlmostEqual(score, expected_metric, places=4)
         
+    def test_past_range(self):
+        y_pred = np.array([0]*10 + [1]*6 + [0]*12)
+        metric = TimeseriesAwareFScore(beta=1, alpha=0.5, delta=0.5, theta=0.5, past_range=True)
+        expected = TimeseriesAwareFScore(beta=1, alpha=0.5, delta=3, theta=0.5)
+        self.assertAlmostEqual(metric.compute(self.y_true1, y_pred), expected.compute(self.y_true1, y_pred), places=4)
+
     def test_consistency(self):
         metric = TimeseriesAwareFScore(beta=1, alpha=0.5,delta=0, theta=0.5)
         try:
