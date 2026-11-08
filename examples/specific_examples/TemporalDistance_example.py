@@ -6,7 +6,7 @@ y_true = [0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
 y_pred = [0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
 
 # Direct usage
-metric = TemporalDistance()
+metric = TemporalDistance(distance="absolute")
 result = metric.compute(y_true, y_pred)
 print("TemporalDistance:", result)
 
@@ -16,7 +16,7 @@ dataset_evaluations = [
 ]
 
 metrics = [
-    ("td", {})
+    ("td", {"distance": "absolute"})
 ]
 
 runner = Runner(dataset_evaluations, metrics)

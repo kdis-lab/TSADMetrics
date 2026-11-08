@@ -22,7 +22,6 @@ class NormalizedAffiliationbasedFScore(Metric):
 
     Notes:
         - If there are no predicted anomalies, the score is 0.
-        - If :math:`1-\\alpha = 0`, the score is 0 to avoid division by zero.
         - If the denominator :math:`\\beta^2 P_{u}^{aff} + \\mathrm{recall}_{aff}` is 0,
           the score is 0 to avoid division by zero.
 
@@ -39,11 +38,13 @@ class NormalizedAffiliationbasedFScore(Metric):
     
     Parameters:
         beta (float):
-            The beta value, which determines the weight of precision in the combined score.
+            Controls the relative importance of recall and precision in the combined score.
+            Values greater than 1 give more relative importance to recall, whereas
+            values between 0 and 1 give more relative importance to precision.
             Default is 1, which gives equal weight to precision and recall.
         alpha (float):
             Normalization threshold applied to affiliation-based precision before computing
-            the F-score. Must satisfy :math:`\\alpha < 1`. Default is 0.
+            the F-score. Must satisfy :math:`0 \\leq \\alpha < 1`. Default is 0.
     """
     name = "naff_f"
     binary_prediction = True
@@ -60,6 +61,9 @@ class NormalizedAffiliationbasedFScore(Metric):
 
     def __init__(self, **kwargs):
         super().__init__(name="naff_f", **kwargs)
+        alpha = self.params["alpha"]
+        if not 0 <= alpha < 1:
+            raise ValueError("Parameter 'alpha' must satisfy 0 <= alpha < 1.")
 
     @staticmethod
     def _events_from_full_series(series):
@@ -100,10 +104,6 @@ class NormalizedAffiliationbasedFScore(Metric):
 
         beta = self.params["beta"]
         alpha = self.params["alpha"]
-
-        # Avoid division by zero if alpha == 1
-        if (1 - alpha) == 0:
-            return 0
 
         Puaff = (precision - alpha) / (1 - alpha)
         denom = (beta**2) * Puaff + recall

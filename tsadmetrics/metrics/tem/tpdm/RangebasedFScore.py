@@ -33,9 +33,12 @@ class RangebasedFScore(Metric):
         r_bias (str): 
             Positional bias for recall ("flat", "front", "middle", "back").
         cardinality_mode (str, optional): 
-            Cardinality factor type ("one", "reciprocal", "gamma").
-        beta (float): 
-            Weight of precision in the F-score. Default = 1.
+            Cardinality factor type ("one", "reciprocal").
+        beta (float):
+            Controls the relative importance of recall and precision in the
+            F-score. Values greater than 1 give more relative importance to
+            recall, whereas values between 0 and 1 give more relative
+            importance to precision. Default = 1.
     """
 
     name = "rbf"
@@ -62,35 +65,29 @@ class RangebasedFScore(Metric):
     # Utility functions
     # -----------------------
 
-    def _gamma(self):
-        """User-defined gamma function (default implementation)."""
-        return 1.0
-
-    def _gamma_select(self, gamma: str, overlap: int) -> float:
+    def _cardinality_factor(self, mode: str, overlap: int) -> float:
         """
-        Select gamma value based on cardinality mode and overlap.
+        Select the cardinality factor based on the configured mode and overlap.
 
         Args:
-            gamma (str): 'one', 'reciprocal', or 'gamma'.
+            mode (str): 'one' or 'reciprocal'.
             overlap (int): Number of overlapping ranges.
 
         Returns:
-            float: Selected gamma factor.
+            float: Cardinality factor.
         """
         assert isinstance(overlap, int), TypeError("overlap must be int")
 
-        if gamma == "one":
+        if mode == "one":
             return 1.0
-        elif gamma == "reciprocal":
+        elif mode == "reciprocal":
             return 1.0 / overlap if overlap > 1 else 1.0
-        elif gamma == "gamma":
-            return 1.0 / self._gamma() if overlap > 1 else 1.0
         else:
-            raise ValueError(f"Invalid gamma type: {gamma}")
+            raise ValueError(f"Invalid cardinality mode: {mode}")
 
-    def _gamma_function(self, overlap_count):
-        """Compute gamma factor from overlap count based on cardinality mode."""
-        return self._gamma_select(self.params['cardinality_mode'], overlap_count[0])
+    def _compute_cardinality_factor(self, overlap_count):
+        """Compute the cardinality factor from the overlap count."""
+        return self._cardinality_factor(self.params['cardinality_mode'], overlap_count[0])
 
     def _compute_omega_reward(self, bias, r1, r2, overlap_count):
         """
@@ -238,7 +235,7 @@ class RangebasedFScore(Metric):
             omega_reward, overlap_count = 0, [0]
             for range_r in y_true:
                 omega_reward += self._compute_omega_reward(self.params["p_bias"], range_p, range_r, overlap_count)
-            overlap_reward = self._gamma_function(overlap_count) * omega_reward
+            overlap_reward = self._compute_cardinality_factor(overlap_count) * omega_reward
             existence_reward = 1 if overlap_count[0] > 0 else 0
             precision += alpha * existence_reward + (1 - alpha) * overlap_reward
         return precision / len(y_pred)
@@ -253,7 +250,7 @@ class RangebasedFScore(Metric):
             omega_reward, overlap_count = 0, [0]
             for range_p in y_pred:
                 omega_reward += self._compute_omega_reward(self.params["r_bias"], range_r, range_p, overlap_count)
-            overlap_reward = self._gamma_function(overlap_count) * omega_reward
+            overlap_reward = self._compute_cardinality_factor(overlap_count) * omega_reward
             existence_reward = 1 if overlap_count[0] > 0 else 0
             recall += alpha * existence_reward + (1 - alpha) * overlap_reward
         return recall / len(y_true)

@@ -5,9 +5,10 @@ class TemporalDistance(Metric):
     """
     Calculate temporal distance for anomaly detection in time series.
 
-    This metric computes the sum of the distances from each labelled anomaly point to
-    the closest predicted anomaly point, and from each predicted anomaly point to the
-    closest labelled anomaly point. 
+    This metric computes two directional sums of one-dimensional absolute Euclidean
+    distances between anomalous points and their nearest counterpart. The selected
+    distance mode combines those sums either directly or by squaring each directional
+    sum.
 
     Reference:
         Implementation based on:
@@ -23,22 +24,27 @@ class TemporalDistance(Metric):
             since it requires binary anomaly scores.
 
     Parameters:
-        distance (int):
-            The distance type parameter for the temporal distance calculation.
-            - 0: Euclidean distance
-            - 1: Squared Euclidean distance
+        distance (str):
+            The distance formulation used for the calculation. Accepted values are
+            ``"absolute"`` for absolute Euclidean distance and ``"squared"`` for
+            squared Euclidean distance applied to each directional sum. The default
+            is ``"absolute"``.
     """
     name = "td"
     binary_prediction = True
     param_schema = {
         "distance": {
-            "default": 0,
-            "type": int
+            "default": "absolute",
+            "type": str
         }
     }
 
     def __init__(self, **kwargs):
         super().__init__(name="td", **kwargs)
+        if self.params["distance"] not in {"absolute", "squared"}:
+            raise ValueError(
+                "Parameter 'distance' must be either 'absolute' or 'squared'."
+            )
 
     @staticmethod
     def _sum_min_dist(a, b, series_len):
@@ -75,9 +81,9 @@ class TemporalDistance(Metric):
         distance = self.params['distance']
         d_true_to_pred = self._sum_min_dist(y_true_pw, y_pred_pw, len(y_true))
         d_pred_to_true = self._sum_min_dist(y_pred_pw, y_true_pw, len(y_true))
-        if distance == 0:
+        if distance == "absolute":
             return d_true_to_pred + d_pred_to_true
-        elif distance == 1:
+        elif distance == "squared":
             return d_true_to_pred**2 + d_pred_to_true**2
         else:
             raise ValueError(f"Distance {distance} not supported")

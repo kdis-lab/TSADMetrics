@@ -48,7 +48,7 @@ class TestAffiliationbasedFScore(unittest.TestCase):
         score = round(metric.compute(self.y_true1, self.y_pred4),2)
         expected_metric = 0
         self.assertAlmostEqual(score, expected_metric, places=4)
-        
+
     def test_consistency(self):
         try:
             y_true = np.random.choice([0, 1], size=(100,))
@@ -105,6 +105,11 @@ class TestNormalizedAffiliationbasedFScore(unittest.TestCase):
         score = round(metric.compute(self.y_true1, self.y_pred4),2)
         expected_metric = 0
         self.assertAlmostEqual(score, expected_metric, places=4)
+
+    def test_alpha_bounds(self):
+        for alpha in (-0.1, 1.0, 1.1):
+            with self.assertRaisesRegex(ValueError, "0 <= alpha < 1"):
+                NormalizedAffiliationbasedFScore(alpha=alpha)
         
     def test_consistency(self):
         try:

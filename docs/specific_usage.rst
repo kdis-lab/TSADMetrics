@@ -614,6 +614,11 @@ AbsoluteDetectionDistance
 TemporalDistance
 ^^^^^^^^^^^^^^^^
 
+The ``distance`` parameter accepts ``"absolute"`` for absolute Euclidean distance
+and ``"squared"`` for squared Euclidean distance. The default is ``"absolute"``.
+The two modes are defined in the API reference and in the mathematical description
+of the metric in the manual.
+
 **Manual evaluation**
 
 .. code-block:: python
@@ -623,7 +628,7 @@ TemporalDistance
     y_true = [0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
     y_pred = [0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
 
-    metric = TemporalDistance(distance=0)
+    metric = TemporalDistance(distance="absolute")
     result = metric.compute(y_true, y_pred)
     print("TemporalDistance:", result)
 
@@ -638,7 +643,7 @@ TemporalDistance
     ]
 
     metrics = [
-        ("td", {"distance":0})
+        ("td", {"distance": "absolute"})
     ]
 
     runner = Runner(dataset_evaluations, metrics)

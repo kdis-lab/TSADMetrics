@@ -22,8 +22,8 @@ class TestTemporalDistance(unittest.TestCase):
         self.y_pred4 = self.y_true1
         self.y_pred5 = np.zeros(len(self.y_true1))
 
-    def test_temporal_distance_euclidean(self):
-        metric = TemporalDistance(distance=0)
+    def test_temporal_distance_absolute_euclidean(self):
+        metric = TemporalDistance(distance="absolute")
 
         td = metric.compute(self.y_true1, self.y_pred1)
         expected = 0
@@ -46,7 +46,7 @@ class TestTemporalDistance(unittest.TestCase):
         self.assertAlmostEqual(score, expected_metric, places=4)
 
     def test_temporal_distance_squared(self):
-        metric = TemporalDistance(distance=1)
+        metric = TemporalDistance(distance="squared")
 
         td = metric.compute(self.y_true1, self.y_pred1)
         expected = 0
@@ -74,10 +74,20 @@ class TestTemporalDistance(unittest.TestCase):
             for _ in range(100):
                 y_true = np.random.choice([0, 1], size=(100,))
                 y_pred = np.zeros(100)
-                metric=TemporalDistance(distance=random.choice([0, 1]))
+                metric=TemporalDistance(distance=random.choice(["absolute", "squared"]))
                 metric.compute(y_true, y_pred)
         except Exception as e:
             self.fail(f"absolute_detection_distance raised an exception {e}")
+
+    def test_distance_values(self):
+        with self.assertRaises(TypeError):
+            TemporalDistance(distance=0)
+
+        with self.assertRaises(TypeError):
+            TemporalDistance(distance=1)
+
+        with self.assertRaises(ValueError):
+            TemporalDistance(distance="unsupported")
 
 
 class TestAbsoluteDetectionDistance(unittest.TestCase):

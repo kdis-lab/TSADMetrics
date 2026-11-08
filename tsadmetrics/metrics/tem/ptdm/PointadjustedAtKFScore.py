@@ -32,7 +32,9 @@ class PointadjustedAtKFScore(Metric):
         k (float):
             The minimum percentage of the anomaly that must be detected to consider the anomaly as detected.
         beta (float):
-            The beta value, which determines the weight of precision in the combined score.
+            Controls the relative importance of recall and precision in the combined score.
+            Values greater than 1 give more relative importance to recall, whereas
+            values between 0 and 1 give more relative importance to precision.
             Default is 1, which gives equal weight to precision and recall.
     """
 

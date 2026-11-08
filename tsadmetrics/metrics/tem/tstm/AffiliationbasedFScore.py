@@ -6,11 +6,14 @@ class AffiliationbasedFScore(Metric):
     """
     Calculate affiliation based F-score for anomaly detection in time series.
 
-    This metric combines the affiliation-based precision and recall into a single score 
-    using the harmonic mean, adjusted by a weight :math:`{\\beta}` to control the relative importance 
-    of recall versus precision. Since both precision and recall are distance-based, 
-    the F-score reflects a balance between how well predicted anomalies align with true 
-    anomalies and vice versa.
+    This metric combines affiliation-based precision and recall into a single score
+    using the harmonic mean, adjusted by a weight :math:`{\\beta}` to control the
+    relative importance of recall versus precision. The affiliation procedure
+    transforms temporal distances into proximity probabilities in the interval
+    :math:`[0, 1]`: values closer to one indicate stronger temporal agreement
+    between predicted and true anomalous events. The global precision and recall
+    are obtained from these event-level probabilities and then combined into the
+    final F-score.
 
     Reference:
         Implementation based on:
@@ -27,7 +30,9 @@ class AffiliationbasedFScore(Metric):
     
     Parameters:
         beta (float):
-            The beta value, which determines the weight of precision in the combined score.
+            Controls the relative importance of recall and precision in the combined score.
+            Values greater than 1 give more relative importance to recall, whereas
+            values between 0 and 1 give more relative importance to precision.
             Default is 1, which gives equal weight to precision and recall.
     """
     name = "aff_f"

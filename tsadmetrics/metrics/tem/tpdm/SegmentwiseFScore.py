@@ -25,7 +25,10 @@ class SegmentwiseFScore(Metric):
             since it requires binary anomaly scores.
     
     Parameters:
-        beta (float): Weight of precision in the harmonic mean.
+        beta (float): Controls the relative importance of recall and precision
+                      in the harmonic mean. Values greater than 1 give more
+                      relative importance to recall, whereas values between 0
+                      and 1 give more relative importance to precision.
                       Default is 1.0 (balanced F1-score).
     """
 
