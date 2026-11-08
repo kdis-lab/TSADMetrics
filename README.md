@@ -1,6 +1,6 @@
 # TSADmetrics - Time Series Anomaly Detection Metrics
 
-[![PyPI version](https://img.shields.io/pypi/v/tsadmetrics?logo=pypi&label=PyPI)](https://pypi.org/project/tsadmetrics/)
+[![PyPI version](https://img.shields.io/pypi/v/tsadmetrics.svg)](https://pypi.org/project/tsadmetrics/)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://github.com/kdis-lab/TSADMetrics/blob/main/pyproject.toml)
 [![Documentation](https://readthedocs.org/projects/tsadmetrics/badge/?version=latest)](https://tsadmetrics.readthedocs.io/en/latest/)
 [![License: GPLv3](https://img.shields.io/badge/license-GPLv3-blue)](https://github.com/kdis-lab/TSADMetrics/blob/main/LICENSE)
