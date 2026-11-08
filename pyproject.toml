@@ -1,7 +1,7 @@
 [project]
 name = "tsadmetrics"
 version = "1.0.16"
-description = "Librería para evaluación de detección de anomalías en series temporales"
+description = "Python library for evaluating time-series anomaly detection methods"
 license = { file = "LICENSE" }
 readme = "README.md"
 authors = [
@@ -14,6 +14,13 @@ dependencies = [
     "pandas",
     "PyYAML"
 ]
+[project.urls]
+Homepage = "https://tsadmetrics.readthedocs.io/"
+"Source Code" = "https://github.com/kdis-lab/TSADMetrics"
+Documentation = "https://tsadmetrics.readthedocs.io/"
+"Issue Tracker" = "https://github.com/kdis-lab/TSADMetrics/issues"
+Paper = "https://doi.org/10.1016/j.neucom.2026.134154"
+
 [project.optional-dependencies]
 dev = [
     "pytest",

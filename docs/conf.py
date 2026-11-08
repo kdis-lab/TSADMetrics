@@ -3,6 +3,7 @@
 
 import os
 import sys
+from importlib.metadata import PackageNotFoundError, version as package_version
 
 CONF_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(CONF_DIR, ".."))
@@ -12,7 +13,10 @@ sys.path.insert(0, PROJECT_ROOT)
 project = 'TSADmetrics'
 copyright = '2025, Pedro Rafael Velasco Priego'
 author = 'Pedro Rafael Velasco Priego'
-release = 'MIT'
+try:
+    release = package_version('tsadmetrics')
+except PackageNotFoundError:
+    release = 'development'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -44,7 +48,10 @@ html_theme_options = {
     "navigation_with_keys": True
 
 }
-html_baseurl = ''
+html_title = 'TSADmetrics — Time-series anomaly detection evaluation metrics'
+html_baseurl = os.environ.get(
+    'READTHEDOCS_CANONICAL_URL', 'https://tsadmetrics.readthedocs.io/en/latest/'
+)
 
 html_css_files = [
     'css/custom.css',

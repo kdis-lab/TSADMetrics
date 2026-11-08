@@ -6,6 +6,9 @@ Welcome to TSADmetrics - Time Series Anomaly Detection Metrics
 **TSADmetrics** is a Python library for evaluating anomaly detection algorithms in time series data.  
 It provides a comprehensive set of binary and non-binary metrics designed specifically for the challenges of anomaly detection in temporal contexts. The metrics are organized into families according to the temporal characteristics they evaluate, such as point-wise performance, event coverage, temporal alignment, detection delay, and timing tolerance. An overview of this organization and guidance for selecting a metric are provided in the :doc:`taxonomy` section.
 
+The `official TSADmetrics source repository <https://github.com/kdis-lab/TSADMetrics>`_
+is maintained by KDIS Lab. The package is also available on `PyPI <https://pypi.org/project/tsadmetrics/>`_.
+
 
 
 
