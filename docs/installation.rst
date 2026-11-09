@@ -1,18 +1,18 @@
 Installation
 ============
 
-TSADmetrics can be installed via pip from PyPI.
-
-.. code-block:: bash
-
-   pip install tsadmetrics
-
-When using ``uv`` to manage project dependencies, add TSADmetrics directly to
-the project environment with:
+TSADmetrics is available on PyPI. If you manage your project with ``uv``, add
+it as a dependency:
 
 .. code-block:: bash
 
    uv add tsadmetrics
+
+Alternatively, install it with ``pip`` in your Python environment:
+
+.. code-block:: bash
+
+   python -m pip install tsadmetrics
 
 Requirements
 ------------

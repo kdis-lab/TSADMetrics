@@ -42,10 +42,16 @@ The project can be download in this repository. Detailed information about getti
 
 ## Installation
 
-Install TSADmetrics via pip:
+TSADmetrics is available on PyPI. If you manage your project with `uv`, add it as a dependency:
 
 ```bash
-pip install tsadmetrics
+uv add tsadmetrics
+```
+
+Alternatively, install it with `pip` in your Python environment:
+
+```bash
+python -m pip install tsadmetrics
 ```
 
 ## Tutorials and documentation
