@@ -48,7 +48,7 @@ html_theme_options = {
     "navigation_with_keys": True
 
 }
-html_title = 'TSADmetrics — Time-series anomaly detection evaluation metrics'
+html_title = 'TSADmetrics — Time Series Anomaly Detection Metrics'
 html_baseurl = os.environ.get(
     'READTHEDOCS_CANONICAL_URL', 'https://tsadmetrics.readthedocs.io/en/latest/'
 )

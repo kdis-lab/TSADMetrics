@@ -17,13 +17,13 @@ This is the official source repository for the [TSADmetrics Python package](http
 
 - **Metric Taxonomy**: Metrics are categorized into types based on how they handle temporal context:
 
-  - **SPM Metrics**: Evaluate predictions at each point independently, ignoring temporal continuity.
-  - **TEM Metrics**: Consider temporal context, analyzing when and how anomalies occur.
-    - **TPDM**: Partial detection within a real anomaly event counts as correct.
-    - **PTDM**: Requires detection to cover a significant fraction of the real anomaly.
-    - **TMEM**: Measures alignment of real vs predicted anomaly events.
-    - **DPM**: Penalizes late detections.
-    - **TSTM**: Allows temporal tolerance for early or late detections.
+  - **Single-Point-based Metrics (SPM)**: Evaluate predictions at each point independently, ignoring temporal continuity.
+  - **Temporal Evaluation Metrics (TEM)**: Consider temporal context, analyzing when and how anomalies occur.
+    - **Tolerant Partial Detection Metrics (TPDM)**: Partial detection within a real anomaly event counts as correct.
+    - **Precise Temporal Detection Metrics (PTDM)**: Requires detection to cover a significant fraction of the real anomaly.
+    - **Temporal Matching Evaluation Metrics (TMEM)**: Measures alignment of real vs predicted anomaly events.
+    - **Delay-Penalized Metrics (DPM)**: Penalizes late detections.
+    - **Temporal Shift-Tolerant Metrics (TSTM)**: Allows temporal tolerance for early or late detections.
 
 - **Direct Metric Usage**: Instantiate any metric class and call `compute()` for individual evaluation.
 
